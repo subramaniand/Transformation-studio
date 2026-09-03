@@ -35,32 +35,32 @@ export default function AdminModule() {
     {
       id: 'users',
       label: '👥 Users',
-      content: <UserManagementSection />,
+      render: () => <UserManagementSection />,
     },
     {
       id: 'roles',
       label: '🔐 Roles',
-      content: <RoleManagementSection />,
+      render: () => <RoleManagementSection />,
     },
     {
       id: 'pricing',
       label: '💰 Pricing Types',
-      content: <PricingTypesSection />,
+      render: () => <PricingTypesSection />,
     },
     {
       id: 'settings',
       label: '⚙️ Settings',
-      content: <SettingsSection />,
+      render: () => <SettingsSection />,
     },
     {
       id: 'audit',
       label: '📋 Audit Logs',
-      content: <AuditLogSection />,
+      render: () => <AuditLogSection />,
     },
     {
       id: 'status',
       label: '📊 System Status',
-      content: <SystemStatusSection />,
+      render: () => <SystemStatusSection />,
     },
   ];
 

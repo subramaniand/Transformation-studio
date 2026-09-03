@@ -34,88 +34,42 @@ export default function PricingModule() {
     setActiveViewTab(tab.id);
   };
 
-  const renderContent = () => {
-    switch (activeViewTab) {
-      case 'list':
-        return <CatalogueListView catalogues={filteredCatalogues} />;
-      case 'parameters':
-        return currentCatalogue ? <ParametersView /> : (
-          <div style={{ padding: '20px' }}>
-            <Card title="Select Catalogue">
-              <p style={{ margin: '0', color: 'var(--tx3)' }}>
-                Please select a catalogue from the list to view and edit parameters
-              </p>
-            </Card>
-          </div>
-        );
-      case 'estimate':
-        return currentCatalogue ? <EstimateView /> : (
-          <div style={{ padding: '20px' }}>
-            <Card title="Select Catalogue">
-              <p style={{ margin: '0', color: 'var(--tx3)' }}>
-                Please select a catalogue from the list to view and create estimates
-              </p>
-            </Card>
-          </div>
-        );
-      case 'export':
-        return <JSONExportView />;
-      default:
-        return <CatalogueListView catalogues={filteredCatalogues} />;
-    }
-  };
-
-  const getTabContent = (tabId) => {
-    switch (tabId) {
-      case 'list':
-        return <CatalogueListView catalogues={filteredCatalogues} />;
-      case 'parameters':
-        return currentCatalogue ? <ParametersView /> : (
-          <div style={{ padding: '20px' }}>
-            <Card title="Select Catalogue">
-              <p style={{ margin: '0', color: 'var(--tx3)' }}>
-                Please select a catalogue from the list to view and edit parameters
-              </p>
-            </Card>
-          </div>
-        );
-      case 'estimate':
-        return currentCatalogue ? <EstimateView /> : (
-          <div style={{ padding: '20px' }}>
-            <Card title="Select Catalogue">
-              <p style={{ margin: '0', color: 'var(--tx3)' }}>
-                Please select a catalogue from the list to view and create estimates
-              </p>
-            </Card>
-          </div>
-        );
-      case 'export':
-        return <JSONExportView />;
-      default:
-        return <CatalogueListView catalogues={filteredCatalogues} />;
-    }
-  };
-
   const tabs = [
     {
       id: 'list',
       label: '📋 Catalogues',
-      content: getTabContent('list'),
+      render: () => <CatalogueListView catalogues={filteredCatalogues} />,
     },
     {
       id: 'parameters',
       label: '⚙️ Parameters',
-      content: getTabContent('parameters'),
+      render: () => currentCatalogue ? <ParametersView /> : (
+        <div style={{ padding: '20px' }}>
+          <Card title="Select Catalogue">
+            <p style={{ margin: '0', color: 'var(--tx3)' }}>
+              Please select a catalogue from the list to view and edit parameters
+            </p>
+          </Card>
+        </div>
+      ),
     },
     {
       id: 'estimate',
       label: '💰 Estimates',
-      content: getTabContent('estimate'),
+      render: () => currentCatalogue ? <EstimateView /> : (
+        <div style={{ padding: '20px' }}>
+          <Card title="Select Catalogue">
+            <p style={{ margin: '0', color: 'var(--tx3)' }}>
+              Please select a catalogue from the list to view and create estimates
+            </p>
+          </Card>
+        </div>
+      ),
     },
     {
       id: 'export',
       label: '📤 Export',
-      content: getTabContent('export'),
+      render: () => <JSONExportView />,
     },
   ];
 

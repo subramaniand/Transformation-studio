@@ -16,6 +16,17 @@ export default function Tabs({
     onChange?.(tabs[index]);
   };
 
+  const activeTab = tabs[activeIndex];
+  const renderContent = () => {
+    if (!activeTab) return null;
+    // If tab has a render function, call it to get dynamic content
+    if (typeof activeTab.render === 'function') {
+      return activeTab.render();
+    }
+    // Otherwise use static content
+    return activeTab.content;
+  };
+
   return (
     <div>
       <div style={{
@@ -52,7 +63,7 @@ export default function Tabs({
         ))}
       </div>
       <div style={{ paddingTop: variant === 'line' ? '16px' : '0' }}>
-        {tabs[activeIndex]?.content}
+        {renderContent()}
       </div>
     </div>
   );

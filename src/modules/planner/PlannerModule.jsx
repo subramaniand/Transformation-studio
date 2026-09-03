@@ -66,22 +66,22 @@ export default function PlannerModule() {
     {
       id: 'wbs',
       label: '🗂 Work Breakdown Structure',
-      content: <WBSView />,
+      render: () => <WBSView />,
     },
     {
       id: 'team',
       label: '👥 Team & Roles',
-      content: <TeamView />,
+      render: () => <TeamView />,
     },
     {
       id: 'gantt',
       label: '📊 Gantt Chart',
-      content: <GanttView />,
+      render: () => <GanttView />,
     },
     {
       id: 'raci',
       label: '🎯 RACI Matrix',
-      content: <RACIView />,
+      render: () => <RACIView />,
     },
   ];
 
