@@ -23,10 +23,10 @@ export default function Sidebar({ collapsed, onCollapse, activeModule, onModuleC
   const fetchCatalogues = usePricingStore(state => state.fetchCatalogues);
 
   useEffect(() => {
-    if (activeModule === 'pricing') {
+    if (activeModule === 'pricing' && catalogues.length === 0) {
       fetchCatalogues();
     }
-  }, [activeModule, fetchCatalogues]);
+  }, [activeModule]);
 
   const getRoleColor = (role) => {
     const colors = {

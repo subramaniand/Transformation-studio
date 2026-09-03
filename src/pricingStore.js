@@ -1,8 +1,14 @@
 import { create } from 'zustand';
 import { supabase } from './supabaseClient';
 
+const DEMO_CATALOGUES = [
+  { id: '1', name: 'Cloud Migration (Tier 1)', type: 'Migration', tier: 0, description: 'Basic cloud infrastructure setup', created_at: new Date().toISOString() },
+  { id: '2', name: 'App Development Platform', type: 'App Development', tier: 1, description: 'Full application development stack', created_at: new Date().toISOString() },
+  { id: '3', name: 'Data Lake Architecture', type: 'Data Architecture', tier: 2, description: 'Enterprise data architecture setup', created_at: new Date().toISOString() },
+];
+
 export const usePricingStore = create((set, get) => ({
-  catalogues: [],
+  catalogues: DEMO_CATALOGUES,
   currentCatalogue: null,
   isLoading: false,
   error: null,
