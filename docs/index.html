@@ -1,48 +1,31 @@
 <!doctype html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Transformation Studio</title>
+    <title>Transformation Studio - Pricing & Delivery Planning</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: system-ui, sans-serif;
-            background: #0f1419;
-            color: #e0e0f0;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .container {
-            text-align: center;
-            padding: 40px;
-            max-width: 500px;
-        }
-        h1 { font-size: 32px; margin-bottom: 20px; }
-        p { font-size: 16px; margin-bottom: 10px; }
-        .status { font-size: 12px; color: #888; margin-top: 20px; }
+      body {
+        margin: 0;
+        padding: 0;
+        background: #0f1419;
+        color: #e0e0f0;
+        font-family: 'Aptos', 'Figtree', 'Segoe UI', system-ui, sans-serif;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      #loading {
+        text-align: center;
+        padding: 20px;
+      }
     </style>
-</head>
-<body>
-    <div class="container">
-        <h1>✓ Transformation Studio</h1>
-        <p>App is ready!</p>
-        <div class="status">
-            <p>If you see this, the basic setup works.</p>
-            <p>Redirecting in 3 seconds...</p>
-        </div>
-    </div>
-
-    <script>
-        console.log('✓ Page loaded successfully');
-        console.log('Base path:', window.location.pathname);
-
-        // Redirect to app after 3 seconds
-        setTimeout(() => {
-            window.location.href = window.location.pathname + '?app=true';
-        }, 3000);
-    </script>
-</body>
+    <script type="module" crossorigin src="/transformation-studio/assets/index-D_soxI-X.js"></script>
+    <link rel="stylesheet" crossorigin href="/transformation-studio/assets/index-5neA-z8D.css">
+  </head>
+  <body>
+    <div id="loading">Loading Transformation Studio...</div>
+    <div id="root"></div>
+  </body>
 </html>
