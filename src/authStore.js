@@ -14,9 +14,22 @@ const ROLE_PERMISSIONS = {
   viewer: { edit: 0, admin: 0, del: 0, create: 0, export: 1 },
 };
 
+const getStoredUsers = () => {
+  try {
+    const stored = localStorage.getItem('users');
+    return stored ? JSON.parse(stored) : DEMO_USERS;
+  } catch {
+    return DEMO_USERS;
+  }
+};
+
+const persistUsers = (users) => {
+  localStorage.setItem('users', JSON.stringify(users));
+};
+
 export const useAuthStore = create((set, get) => ({
   user: null,
-  users: [],
+  users: getStoredUsers(),
   isLoading: false,
   error: null,
   theme: 'ust-light',
@@ -71,14 +84,23 @@ export const useAuthStore = create((set, get) => ({
 
   // Fetch all users (admin only)
   fetchUsers: async () => {
+    if (!isSupabaseConfigured) {
+      return get().users;
+    }
+
     set({ isLoading: true });
     try {
       const { data, error } = await supabase.from('users').select('*');
       if (error) throw error;
-      set({ users: data || DEMO_USERS, isLoading: false });
+      const users = data?.length ? data : getStoredUsers();
+      persistUsers(users);
+      set({ users, isLoading: false });
+      return users;
     } catch (err) {
       console.warn('Could not fetch users from Supabase, using demo data');
-      set({ users: DEMO_USERS, isLoading: false });
+      const users = getStoredUsers();
+      set({ users, isLoading: false });
+      return users;
     }
   },
 
@@ -92,6 +114,13 @@ export const useAuthStore = create((set, get) => ({
         active: true,
       };
 
+      if (!isSupabaseConfigured) {
+        const users = [...get().users, user];
+        persistUsers(users);
+        set({ users });
+        return user;
+      }
+
       const { data, error } = await supabase
         .from('users')
         .insert([user])
@@ -103,6 +132,7 @@ export const useAuthStore = create((set, get) => ({
       set(state => ({
         users: [...state.users, data || user],
       }));
+      persistUsers(get().users);
 
       return data || user;
     } catch (err) {
@@ -122,6 +152,20 @@ export const useAuthStore = create((set, get) => ({
 
   // Update user
   updateUser: async (userId, updates) => {
+    if (!isSupabaseConfigured) {
+      const users = get().users.map(user => user.id === userId ? { ...user, ...updates } : user);
+      const updatedUser = users.find(user => user.id === userId);
+      persistUsers(users);
+      set({
+        users,
+        user: get().user?.id === userId ? updatedUser : get().user,
+      });
+      if (updatedUser?.id === get().user?.id) {
+        localStorage.setItem('auth_user', JSON.stringify(updatedUser));
+      }
+      return updatedUser;
+    }
+
     try {
       const { data, error } = await supabase
         .from('users')
@@ -137,6 +181,7 @@ export const useAuthStore = create((set, get) => ({
         users: state.users.map(u => u.id === userId ? (data || { ...u, ...updates }) : u),
         user: state.user?.id === userId ? (data || { ...state.user, ...updates }) : state.user,
       }));
+      persistUsers(get().users);
 
       if (data) {
         localStorage.setItem('auth_user', JSON.stringify(data));
@@ -150,12 +195,20 @@ export const useAuthStore = create((set, get) => ({
         users: state.users.map(u => u.id === userId ? { ...u, ...updates } : u),
         user: state.user?.id === userId ? { ...state.user, ...updates } : state.user,
       }));
+      persistUsers(get().users);
       throw err;
     }
   },
 
   // Delete user
   deleteUser: async (userId) => {
+    if (!isSupabaseConfigured) {
+      const users = get().users.filter(user => user.id !== userId);
+      persistUsers(users);
+      set({ users, user: get().user?.id === userId ? null : get().user });
+      return true;
+    }
+
     try {
       const { error } = await supabase
         .from('users')
@@ -168,6 +221,7 @@ export const useAuthStore = create((set, get) => ({
         users: state.users.filter(u => u.id !== userId),
         user: state.user?.id === userId ? null : state.user,
       }));
+      persistUsers(get().users);
 
       return true;
     } catch (err) {
@@ -177,6 +231,7 @@ export const useAuthStore = create((set, get) => ({
         users: state.users.filter(u => u.id !== userId),
         user: state.user?.id === userId ? null : state.user,
       }));
+      persistUsers(get().users);
       throw err;
     }
   },

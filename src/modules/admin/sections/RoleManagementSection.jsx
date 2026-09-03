@@ -10,35 +10,12 @@ import Button from '../../../components/ui/Button';
 import Badge from '../../../components/ui/Badge';
 import FormField from '../../../components/ui/FormField';
 
-const DEMO_ROLES = [
-  {
-    id: 'r1',
-    name: 'Admin',
-    description: 'Full system access',
-    permissions: { create: true, edit: true, delete: true, admin: true, export: true },
-    users: 3,
-    active: true,
-  },
-  {
-    id: 'r2',
-    name: 'Analyst',
-    description: 'Can create and edit catalogues',
-    permissions: { create: true, edit: true, delete: false, admin: false, export: true },
-    users: 5,
-    active: true,
-  },
-  {
-    id: 'r3',
-    name: 'Viewer',
-    description: 'Read-only access',
-    permissions: { create: false, edit: false, delete: false, admin: false, export: true },
-    users: 12,
-    active: true,
-  },
-];
-
 export default function RoleManagementSection() {
-  const [roles, setRoles] = useState(DEMO_ROLES);
+  const roles = useAdminStore(state => state.roles);
+  const addRole = useAdminStore(state => state.addRole);
+  const updateRole = useAdminStore(state => state.updateRole);
+  const deleteRole = useAdminStore(state => state.deleteRole);
+  const users = useAuthStore(state => state.users);
   const [editingRole, setEditingRole] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
@@ -86,17 +63,9 @@ export default function RoleManagementSection() {
     }
 
     if (editingRole) {
-      setRoles(roles.map(r => r.id === editingRole.id ? {
-        ...editingRole,
-        ...formData,
-      } : r));
+      updateRole(editingRole.id, formData);
     } else {
-      setRoles([...roles, {
-        id: 'r' + Date.now(),
-        ...formData,
-        users: 0,
-        active: true,
-      }]);
+      addRole(formData);
     }
 
     setShowForm(false);
@@ -105,7 +74,7 @@ export default function RoleManagementSection() {
 
   const handleDeleteRole = (roleId) => {
     if (confirm('Are you sure you want to delete this role?')) {
-      setRoles(roles.filter(r => r.id !== roleId));
+      deleteRole(roleId);
     }
   };
 
@@ -136,7 +105,7 @@ export default function RoleManagementSection() {
     id: role.id,
     name: role.name,
     description: role.description,
-    users: role.users,
+    users: users.filter(user => user.role === role.name.toLowerCase()).length,
     permissions: `${getPermissionCount(role.permissions)}/5`,
     status: <Badge variant={role.active ? 'success' : 'danger'}>
       {role.active ? 'Active' : 'Inactive'}

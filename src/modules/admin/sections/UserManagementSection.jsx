@@ -3,6 +3,7 @@
  */
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '../../../authStore';
+import { useAdminStore } from '../../../adminStore';
 import Card from '../../../components/ui/Card';
 import Table from '../../../components/ui/Table';
 import Button from '../../../components/ui/Button';
@@ -16,6 +17,7 @@ export default function UserManagementSection() {
   const addUser = useAuthStore(state => state.addUser);
   const updateUser = useAuthStore(state => state.updateUser);
   const deleteUser = useAuthStore(state => state.deleteUser);
+  const roles = useAdminStore(state => state.roles);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [formData, setFormData] = useState({
@@ -249,9 +251,7 @@ export default function UserManagementSection() {
               value={formData.role}
               onChange={handleFormChange}
               options={[
-                { value: 'admin', label: 'Admin' },
-                { value: 'analyst', label: 'Analyst' },
-                { value: 'viewer', label: 'Viewer' },
+                ...roles.map(role => ({ value: role.name.toLowerCase(), label: role.name })),
               ]}
             />
 

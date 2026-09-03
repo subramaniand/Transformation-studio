@@ -57,7 +57,48 @@ const SYSTEM_STATUS_INIT = {
   version: '1.0.0',
 };
 
+const DEMO_ROLES = [
+  {
+    id: 'r1',
+    name: 'Admin',
+    description: 'Full system access',
+    permissions: { create: true, edit: true, delete: true, admin: true, export: true },
+    users: 3,
+    active: true,
+  },
+  {
+    id: 'r2',
+    name: 'Analyst',
+    description: 'Can create and edit catalogues',
+    permissions: { create: true, edit: true, delete: false, admin: false, export: true },
+    users: 5,
+    active: true,
+  },
+  {
+    id: 'r3',
+    name: 'Viewer',
+    description: 'Read-only access',
+    permissions: { create: false, edit: false, delete: false, admin: false, export: true },
+    users: 12,
+    active: true,
+  },
+];
+
+const getStoredRoles = () => {
+  try {
+    const stored = localStorage.getItem('roles');
+    return stored ? JSON.parse(stored) : DEMO_ROLES;
+  } catch {
+    return DEMO_ROLES;
+  }
+};
+
+const persistRoles = (roles) => {
+  localStorage.setItem('roles', JSON.stringify(roles));
+};
+
 export const useAdminStore = create((set, get) => ({
+  roles: getStoredRoles(),
   auditLogs: DEMO_AUDIT_LOGS,
   pricingTypes: DEMO_PRICING_TYPES,
   systemStatus: SYSTEM_STATUS_INIT,
@@ -244,6 +285,31 @@ export const useAdminStore = create((set, get) => ({
 
   selectRole: (role) => {
     set({ editingRole: role });
+  },
+
+  addRole: (role) => {
+    const newRole = {
+      ...role,
+      id: crypto.randomUUID(),
+      users: 0,
+      active: true,
+    };
+    const roles = [...get().roles, newRole];
+    persistRoles(roles);
+    set({ roles });
+    return newRole;
+  },
+
+  updateRole: (roleId, updates) => {
+    const roles = get().roles.map(role => role.id === roleId ? { ...role, ...updates } : role);
+    persistRoles(roles);
+    set({ roles });
+  },
+
+  deleteRole: (roleId) => {
+    const roles = get().roles.filter(role => role.id !== roleId);
+    persistRoles(roles);
+    set({ roles });
   },
 
   clearError: () => set({ error: null }),
