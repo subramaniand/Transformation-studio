@@ -16,8 +16,9 @@ export default function PlannerModule() {
   const activeProject = usePlannerStore(state => state.activeProject);
   const projects = usePlannerStore(state => state.projects);
   const selectProject = usePlannerStore(state => state.selectProject);
+  const activeView = usePlannerStore(state => state.activeView);
+  const setActiveView = usePlannerStore(state => state.setActiveView);
   const hasPermission = useAuthStore(state => state.hasPermission);
-  const [activeTab, setActiveTab] = useState('wbs');
 
   if (!activeProject) {
     return (
@@ -141,8 +142,8 @@ export default function PlannerModule() {
         }}>
           <Tabs
             tabs={tabs}
-            defaultActive={0}
-            onChange={(tab) => setActiveTab(tab.id)}
+            defaultActive={tabs.findIndex(t => t.id === activeView)}
+            onChange={(tab) => setActiveView(tab.id)}
             variant="line"
           />
         </div>

@@ -20,16 +20,102 @@ html.ust-light {
   --bg2: #f8f9fa;
   --bg3: #e9ecef;
   --bg4: #dee2e6;
-  --bd: rgba(0, 0, 0, 0.2);
-  --bd2: rgba(0, 0, 0, 0.25);
-  --tx: #000000;
-  --tx2: #111111;
-  --tx3: #333333;
-  --ac: #003d82;
+  --bd: rgba(0, 0, 0, 0.12);
+  --bd2: rgba(0, 0, 0, 0.18);
+  --tx: #1a1a1a;
+  --tx2: #404040;
+  --tx3: #666666;
+  --ac: #004b87;
   --gold: #c97b00;
   --grn: #1a9e6e;
   --amb: #c97b00;
   --red: #c05020;
+}
+
+html.ust-light .lfld input,
+html.ust-light .fld input,
+html.ust-light .fld select,
+html.ust-light .fld textarea {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.15);
+  color: #1a1a1a;
+}
+
+html.ust-light .lfld input:focus,
+html.ust-light .fld input:focus,
+html.ust-light .fld select:focus,
+html.ust-light .fld textarea:focus {
+  background: #f0f4f8;
+  border-color: #004b87;
+}
+
+html.ust-light .lbox {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.12);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+}
+
+html.ust-light .m-box {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
+html.ust-light .m-box h3 {
+  color: #1a1a1a;
+}
+
+html.ust-light button,
+html.ust-light .sbtn {
+  color: #1a1a1a;
+}
+
+html.ust-light .lbtn {
+  background: #004b87;
+  color: #ffffff;
+}
+
+html.ust-light .lbtn:hover {
+  background: #003a66;
+}
+
+html.ust-light .tbtn {
+  background: rgba(0, 75, 135, 0.08);
+  border-color: rgba(0, 75, 135, 0.2);
+  color: #004b87;
+}
+
+html.ust-light .tbtn:hover {
+  background: rgba(0, 75, 135, 0.15);
+  border-color: #004b87;
+}
+
+html.ust-light .tbtn.pri {
+  background: #004b87;
+  color: #ffffff;
+  border-color: #004b87;
+}
+
+html.ust-light .tbtn.pri:hover {
+  background: #003a66;
+}
+
+html.ust-light .sb-btn {
+  background: rgba(0, 75, 135, 0.08);
+  border-color: rgba(0, 75, 135, 0.2);
+  color: #004b87;
+}
+
+html.ust-light .sb-btn:hover {
+  background: rgba(0, 75, 135, 0.15);
+}
+
+html.ust-light .pv {
+  color: #404040;
+}
+
+html.ust-light .pv.on {
+  background: #004b87;
+  color: #ffffff;
 }
 
 html.ust-dark {

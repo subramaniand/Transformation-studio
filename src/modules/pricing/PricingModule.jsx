@@ -65,26 +65,57 @@ export default function PricingModule() {
     }
   };
 
+  const getTabContent = (tabId) => {
+    switch (tabId) {
+      case 'list':
+        return <CatalogueListView catalogues={filteredCatalogues} />;
+      case 'parameters':
+        return currentCatalogue ? <ParametersView /> : (
+          <div style={{ padding: '20px' }}>
+            <Card title="Select Catalogue">
+              <p style={{ margin: '0', color: 'var(--tx3)' }}>
+                Please select a catalogue from the list to view and edit parameters
+              </p>
+            </Card>
+          </div>
+        );
+      case 'estimate':
+        return currentCatalogue ? <EstimateView /> : (
+          <div style={{ padding: '20px' }}>
+            <Card title="Select Catalogue">
+              <p style={{ margin: '0', color: 'var(--tx3)' }}>
+                Please select a catalogue from the list to view and create estimates
+              </p>
+            </Card>
+          </div>
+        );
+      case 'export':
+        return <JSONExportView />;
+      default:
+        return <CatalogueListView catalogues={filteredCatalogues} />;
+    }
+  };
+
   const tabs = [
     {
       id: 'list',
       label: '📋 Catalogues',
-      content: renderContent(),
+      content: getTabContent('list'),
     },
     {
       id: 'parameters',
       label: '⚙️ Parameters',
-      content: renderContent(),
+      content: getTabContent('parameters'),
     },
     {
       id: 'estimate',
       label: '💰 Estimates',
-      content: renderContent(),
+      content: getTabContent('estimate'),
     },
     {
       id: 'export',
       label: '📤 Export',
-      content: renderContent(),
+      content: getTabContent('export'),
     },
   ];
 

@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useAuthStore } from '../authStore';
 import { usePricingStore } from '../pricingStore';
+import { usePlannerStore } from '../plannerStore';
 
 const TIER_COLS = ['#1a9e6e', '#4a9d3f', '#c97b00', '#c05020', '#a32d2d'];
 const CAT_ICONS = {
@@ -21,6 +22,8 @@ export default function Sidebar({ collapsed, onCollapse, activeModule, onModuleC
   const catalogues = usePricingStore(state => state.catalogues);
   const selectCatalogue = usePricingStore(state => state.selectCatalogue);
   const fetchCatalogues = usePricingStore(state => state.fetchCatalogues);
+  const activeView = usePlannerStore(state => state.activeView);
+  const setActiveView = usePlannerStore(state => state.setActiveView);
 
   useEffect(() => {
     if (activeModule === 'pricing' && catalogues.length === 0) {
@@ -148,19 +151,31 @@ export default function Sidebar({ collapsed, onCollapse, activeModule, onModuleC
         <div id="planner-nav" style={{ padding: '11px 16px 4px', fontSize: '9.5px' }}>
           <div className="sb-sec">Planner Views</div>
           <div style={{ padding: '0 8px' }}>
-            <button className="sb-nav-item on">
+            <button
+              className={`sb-nav-item ${activeView === 'wbs' ? 'on' : ''}`}
+              onClick={() => setActiveView('wbs')}
+            >
               <span className="sb-nav-ico">🗂</span>
               <span>WBS</span>
             </button>
-            <button className="sb-nav-item">
+            <button
+              className={`sb-nav-item ${activeView === 'team' ? 'on' : ''}`}
+              onClick={() => setActiveView('team')}
+            >
               <span className="sb-nav-ico">👥</span>
               <span>Team & Roles</span>
             </button>
-            <button className="sb-nav-item">
+            <button
+              className={`sb-nav-item ${activeView === 'gantt' ? 'on' : ''}`}
+              onClick={() => setActiveView('gantt')}
+            >
               <span className="sb-nav-ico">📅</span>
               <span>Timeline / Gantt</span>
             </button>
-            <button className="sb-nav-item">
+            <button
+              className={`sb-nav-item ${activeView === 'raci' ? 'on' : ''}`}
+              onClick={() => setActiveView('raci')}
+            >
               <span className="sb-nav-ico">🎯</span>
               <span>RACI Matrix</span>
             </button>

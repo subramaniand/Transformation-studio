@@ -19,7 +19,7 @@ export const useAuthStore = create((set, get) => ({
   users: [],
   isLoading: false,
   error: null,
-  theme: 'default',
+  theme: 'ust-light',
 
   // Login user
   login: async (username, password) => {

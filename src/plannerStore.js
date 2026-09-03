@@ -56,6 +56,7 @@ export const usePlannerStore = create((set, get) => ({
   expandedWBSNodes: new Set(),
   selectedWBSItem: null,
   ganttZoom: 'month',
+  activeView: 'wbs',
   isLoading: false,
   error: null,
 
@@ -291,6 +292,10 @@ export const usePlannerStore = create((set, get) => ({
 
   setGanttZoom: (zoom) => {
     set({ ganttZoom: zoom });
+  },
+
+  setActiveView: (view) => {
+    set({ activeView: view });
   },
 
   clearError: () => set({ error: null }),
