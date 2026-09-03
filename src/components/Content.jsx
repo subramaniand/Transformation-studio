@@ -1,15 +1,32 @@
 import { useState } from 'react';
 import { useAuthStore } from '../authStore';
 import { usePricingStore } from '../pricingStore';
+import { usePlannerStore } from '../plannerStore';
+import { useAdminStore } from '../adminStore';
+import PricingModule from '../modules/pricing/PricingModule';
+import PlannerModule from '../modules/planner/PlannerModule';
+import AdminModule from '../modules/admin/AdminModule';
 
 export default function Content({ module }) {
   const user = useAuthStore(state => state.user);
   const hasPermission = useAuthStore(state => state.hasPermission);
   const currentCatalogue = usePricingStore(state => state.currentCatalogue);
-  const [showModal, setShowModal] = useState(false);
 
-  // PRICING CATALOGUE VIEW
+  // Use new modular components
   if (module === 'pricing') {
+    return <PricingModule />;
+  }
+
+  if (module === 'planner') {
+    return <PlannerModule />;
+  }
+
+  if (module === 'admin') {
+    return <AdminModule />;
+  }
+
+  // Fallback views (for reference)
+  if (module === '_old_pricing') {
     return (
       <div className="content">
         {!currentCatalogue ? (

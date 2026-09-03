@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuthStore } from './authStore';
+import { ModalProvider } from './context/ModalContext';
 import './App.css';
 import LoginShell from './components/LoginShell';
 import Sidebar from './components/Sidebar';
@@ -27,17 +28,19 @@ export default function App() {
   }
 
   return (
-    <div className={`app ${sidebarCollapsed ? 'sb-collapsed' : ''}`}>
-      <Sidebar
-        collapsed={sidebarCollapsed}
-        onCollapse={setSidebarCollapsed}
-        activeModule={activeModule}
-        onModuleChange={setActiveModule}
-      />
-      <div className="main">
-        <Topbar />
-        <Content module={activeModule} />
+    <ModalProvider>
+      <div className={`app ${sidebarCollapsed ? 'sb-collapsed' : ''}`}>
+        <Sidebar
+          collapsed={sidebarCollapsed}
+          onCollapse={setSidebarCollapsed}
+          activeModule={activeModule}
+          onModuleChange={setActiveModule}
+        />
+        <div className="main">
+          <Topbar />
+          <Content module={activeModule} />
+        </div>
       </div>
-    </div>
+    </ModalProvider>
   );
 }
