@@ -17,40 +17,74 @@ import JSONExportView from './views/JSONExportView';
 import CreateCatalogueModal from './modals/CreateCatalogueModal';
 
 export default function PricingModule() {
-  const currentView = usePricingStore(state => state.currentView);
-  const setView = usePricingStore(state => state.setView);
   const catalogues = usePricingStore(state => state.catalogues);
   const currentCatalogue = usePricingStore(state => state.currentCatalogue);
   const selectCatalogue = usePricingStore(state => state.selectCatalogue);
   const hasPermission = useAuthStore(state => state.hasPermission);
   const openModal = useModal().openModal;
   const [searchTerm, setSearchTerm] = useState('');
+  const [activeViewTab, setActiveViewTab] = useState('list');
 
   const filteredCatalogues = catalogues.filter(c =>
     c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     c.type.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const handleTabChange = (tab) => {
+    setActiveViewTab(tab.id);
+  };
+
+  const renderContent = () => {
+    switch (activeViewTab) {
+      case 'list':
+        return <CatalogueListView catalogues={filteredCatalogues} />;
+      case 'parameters':
+        return currentCatalogue ? <ParametersView /> : (
+          <div style={{ padding: '20px' }}>
+            <Card title="Select Catalogue">
+              <p style={{ margin: '0', color: 'var(--tx3)' }}>
+                Please select a catalogue from the list to view and edit parameters
+              </p>
+            </Card>
+          </div>
+        );
+      case 'estimate':
+        return currentCatalogue ? <EstimateView /> : (
+          <div style={{ padding: '20px' }}>
+            <Card title="Select Catalogue">
+              <p style={{ margin: '0', color: 'var(--tx3)' }}>
+                Please select a catalogue from the list to view and create estimates
+              </p>
+            </Card>
+          </div>
+        );
+      case 'export':
+        return <JSONExportView />;
+      default:
+        return <CatalogueListView catalogues={filteredCatalogues} />;
+    }
+  };
+
   const tabs = [
     {
       id: 'list',
       label: '📋 Catalogues',
-      content: <CatalogueListView catalogues={filteredCatalogues} />,
+      content: renderContent(),
     },
     {
       id: 'parameters',
       label: '⚙️ Parameters',
-      content: currentCatalogue ? <ParametersView /> : <Card title="Select Catalogue">Please select a catalogue to view parameters</Card>,
+      content: renderContent(),
     },
     {
       id: 'estimate',
       label: '💰 Estimates',
-      content: currentCatalogue ? <EstimateView /> : <Card title="Select Catalogue">Please select a catalogue to view estimates</Card>,
+      content: renderContent(),
     },
     {
       id: 'export',
       label: '📤 Export',
-      content: <JSONExportView />,
+      content: renderContent(),
     },
   ];
 
@@ -111,7 +145,7 @@ export default function PricingModule() {
           <Tabs
             tabs={tabs}
             defaultActive={0}
-            onChange={(tab) => setView(tab.id)}
+            onChange={handleTabChange}
             variant="line"
           />
         </div>

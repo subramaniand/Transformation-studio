@@ -8,6 +8,8 @@ import Tabs from '../../components/ui/Tabs';
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
 import UserManagementSection from './sections/UserManagementSection';
+import RoleManagementSection from './sections/RoleManagementSection';
+import SettingsSection from './sections/SettingsSection';
 import PricingTypesSection from './sections/PricingTypesSection';
 import AuditLogSection from './sections/AuditLogSection';
 import SystemStatusSection from './sections/SystemStatusSection';
@@ -36,9 +38,19 @@ export default function AdminModule() {
       content: <UserManagementSection />,
     },
     {
+      id: 'roles',
+      label: '🔐 Roles',
+      content: <RoleManagementSection />,
+    },
+    {
       id: 'pricing',
       label: '💰 Pricing Types',
       content: <PricingTypesSection />,
+    },
+    {
+      id: 'settings',
+      label: '⚙️ Settings',
+      content: <SettingsSection />,
     },
     {
       id: 'audit',
@@ -47,7 +59,7 @@ export default function AdminModule() {
     },
     {
       id: 'status',
-      label: '⚙️ System Status',
+      label: '📊 System Status',
       content: <SystemStatusSection />,
     },
   ];
