@@ -99,6 +99,16 @@ export default function Sidebar({ collapsed, onCollapse, activeModule, onModuleC
           <span className="sb-nav-ico">📅</span>
           <span>Delivery Planner</span>
         </button>
+        {hasPermission('admin') && (
+          <button
+            className={`sb-nav-item ${activeModule === 'admin' ? 'on' : ''}`}
+            onClick={() => onModuleChange('admin')}
+            style={{ color: 'var(--gold)' }}
+          >
+            <span className="sb-nav-ico">⚙</span>
+            <span>Admin Panel</span>
+          </button>
+        )}
       </div>
 
       {/* PRICING: catalogue list */}
