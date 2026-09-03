@@ -559,6 +559,8 @@ body {
 .main {
   display: flex;
   flex-direction: column;
+  height: 100%;
+  min-height: 100vh;
 }
 
 .topbar {
@@ -569,6 +571,7 @@ body {
   background: var(--bg2);
   border-bottom: 1px solid var(--bd);
   flex-wrap: wrap;
+  flex-shrink: 0;
 }
 
 .tb-l {
@@ -650,6 +653,7 @@ body {
   flex: 1;
   padding: 16px;
   overflow: auto;
+  min-height: 0;
 }
 
 /* MODAL */
