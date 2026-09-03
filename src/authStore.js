@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { supabase } from './supabaseClient';
+import { isSupabaseConfigured, supabase } from './supabaseClient';
 
 // Demo users for offline/initial use
 const DEMO_USERS = [
@@ -25,18 +25,19 @@ export const useAuthStore = create((set, get) => ({
   login: async (username, password) => {
     set({ isLoading: true, error: null });
     try {
-      // First try Supabase
-      const { data, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('username', username)
-        .eq('password', password)
-        .single();
+      if (isSupabaseConfigured) {
+        const { data, error } = await supabase
+          .from('users')
+          .select('*')
+          .eq('username', username)
+          .eq('password', password)
+          .single();
 
-      if (!error && data) {
-        set({ user: data, isLoading: false });
-        localStorage.setItem('auth_user', JSON.stringify(data));
-        return { success: true, user: data };
+        if (!error && data) {
+          set({ user: data, isLoading: false });
+          localStorage.setItem('auth_user', JSON.stringify(data));
+          return { success: true, user: data };
+        }
       }
 
       // Fallback to demo users if no Supabase connection

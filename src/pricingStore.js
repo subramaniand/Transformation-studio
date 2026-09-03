@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { supabase } from './supabaseClient';
+import { isSupabaseConfigured, supabase } from './supabaseClient';
 
 const DEMO_TIERS = [
   { id: '1', name: 'Standard', costMultiplier: 1, color: '#004b87', description: 'Standard implementation' },
@@ -116,6 +116,11 @@ export const usePricingStore = create((set, get) => ({
   // Fetch catalogues
   fetchCatalogues: async () => {
     set({ isLoading: true, error: null });
+    if (!isSupabaseConfigured) {
+      set({ isLoading: false });
+      return get().catalogues;
+    }
+
     try {
       const { data, error } = await supabase
         .from('catalogues')
@@ -123,8 +128,9 @@ export const usePricingStore = create((set, get) => ({
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      set({ catalogues: data || [], isLoading: false });
-      return data || [];
+      const catalogues = data?.length ? data : DEMO_CATALOGUES;
+      set({ catalogues, isLoading: false });
+      return catalogues;
     } catch (err) {
       console.error('Error fetching catalogues:', err.message);
       set({ error: err.message, isLoading: false });
