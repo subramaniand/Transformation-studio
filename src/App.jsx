@@ -17,13 +17,15 @@ export default function App() {
 
   useEffect(() => {
     try {
+      console.log('Restoring session and theme...');
       restoreSession();
       restoreTheme();
+      console.log('Session and theme restored');
     } catch (err) {
       console.error('Error restoring session:', err);
       setError(err.message);
     }
-  }, [restoreSession, restoreTheme]);
+  }, []);
 
   if (error) {
     return <div style={{ color: '#ff7070', padding: '20px' }}>Error: {error}</div>;
