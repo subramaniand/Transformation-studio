@@ -26,6 +26,10 @@ export default function ParametersView() {
     updateCatalogueParameters(currentCatalogue.id, updatedParams);
   };
 
+  const handleSaveParameters = () => {
+    alert('Parameters updated successfully!');
+  };
+
   return (
     <div style={{ padding: '20px' }}>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '20px' }}>
@@ -67,8 +71,8 @@ export default function ParametersView() {
 
       {hasPermission('edit') && (
         <div style={{ marginTop: '24px', display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-          <Button variant="secondary">Cancel</Button>
-          <Button variant="primary">Save Changes</Button>
+          <Button variant="secondary" onClick={() => window.location.reload()}>Cancel</Button>
+          <Button variant="primary" onClick={handleSaveParameters}>Save Changes</Button>
         </div>
       )}
     </div>

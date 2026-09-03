@@ -133,10 +133,27 @@ export default function EstimateView() {
                 </div>
                 {hasPermission('edit') && (
                   <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                    <Button size="small" variant="secondary">
+                    <Button
+                      size="small"
+                      variant="secondary"
+                      onClick={() => {
+                        const name = prompt('Edit scenario name:', estimate.scenarioName);
+                        if (name) {
+                          updateEstimate(currentCatalogue.id, estimate.id, { scenarioName: name });
+                        }
+                      }}
+                    >
                       ✏️ Edit
                     </Button>
-                    <Button size="small" variant="danger" onClick={() => deleteEstimate(currentCatalogue.id, estimate.id)}>
+                    <Button
+                      size="small"
+                      variant="danger"
+                      onClick={() => {
+                        if (confirm('Are you sure you want to delete this estimate?')) {
+                          deleteEstimate(currentCatalogue.id, estimate.id);
+                        }
+                      }}
+                    >
                       🗑️
                     </Button>
                   </div>

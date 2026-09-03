@@ -81,6 +81,44 @@ export const useAuthStore = create((set, get) => ({
     }
   },
 
+  // Add new user
+  addUser: async (newUser) => {
+    try {
+      const user = {
+        ...newUser,
+        id: crypto.randomUUID(),
+        created: new Date().toISOString().split('T')[0],
+        active: true,
+      };
+
+      const { data, error } = await supabase
+        .from('users')
+        .insert([user])
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      set(state => ({
+        users: [...state.users, data || user],
+      }));
+
+      return data || user;
+    } catch (err) {
+      console.error('Error adding user:', err.message);
+      // Still add to local list even if Supabase fails
+      set(state => ({
+        users: [...state.users, {
+          ...newUser,
+          id: crypto.randomUUID(),
+          created: new Date().toISOString().split('T')[0],
+          active: true,
+        }],
+      }));
+      throw err;
+    }
+  },
+
   // Update user
   updateUser: async (userId, updates) => {
     try {
@@ -95,8 +133,8 @@ export const useAuthStore = create((set, get) => ({
 
       // Update local users list
       set(state => ({
-        users: state.users.map(u => u.id === userId ? data : u),
-        user: state.user?.id === userId ? data : state.user,
+        users: state.users.map(u => u.id === userId ? (data || { ...u, ...updates }) : u),
+        user: state.user?.id === userId ? (data || { ...state.user, ...updates }) : state.user,
       }));
 
       if (data) {
@@ -106,6 +144,38 @@ export const useAuthStore = create((set, get) => ({
       return data;
     } catch (err) {
       console.error('Error updating user:', err.message);
+      // Still update local list even if Supabase fails
+      set(state => ({
+        users: state.users.map(u => u.id === userId ? { ...u, ...updates } : u),
+        user: state.user?.id === userId ? { ...state.user, ...updates } : state.user,
+      }));
+      throw err;
+    }
+  },
+
+  // Delete user
+  deleteUser: async (userId) => {
+    try {
+      const { error } = await supabase
+        .from('users')
+        .delete()
+        .eq('id', userId);
+
+      if (error) throw error;
+
+      set(state => ({
+        users: state.users.filter(u => u.id !== userId),
+        user: state.user?.id === userId ? null : state.user,
+      }));
+
+      return true;
+    } catch (err) {
+      console.error('Error deleting user:', err.message);
+      // Still delete from local list even if Supabase fails
+      set(state => ({
+        users: state.users.filter(u => u.id !== userId),
+        user: state.user?.id === userId ? null : state.user,
+      }));
       throw err;
     }
   },

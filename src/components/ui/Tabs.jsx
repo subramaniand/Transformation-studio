@@ -1,7 +1,7 @@
 /**
  * Tabs Component - Tab navigation
  */
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function Tabs({
   tabs = [],
@@ -9,7 +9,13 @@ export default function Tabs({
   onChange,
   variant = 'line',
 }) {
-  const [activeIndex, setActiveIndex] = useState(defaultActive);
+  const [activeIndex, setActiveIndex] = useState(Math.max(0, defaultActive));
+
+  // Update activeIndex when defaultActive changes
+  useEffect(() => {
+    const newIndex = Math.max(0, defaultActive);
+    setActiveIndex(newIndex);
+  }, [defaultActive]);
 
   const handleChange = (index) => {
     setActiveIndex(index);

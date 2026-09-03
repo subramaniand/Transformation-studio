@@ -9,8 +9,15 @@ import Button from '../../../components/ui/Button';
 
 export default function CatalogueListView({ catalogues }) {
   const selectCatalogue = usePricingStore(state => state.selectCatalogue);
+  const deleteCatalogue = usePricingStore(state => state.deleteCatalogue);
   const currentCatalogue = usePricingStore(state => state.currentCatalogue);
   const hasPermission = useAuthStore(state => state.hasPermission);
+
+  const handleDeleteCatalogue = (catalogue) => {
+    if (confirm(`Are you sure you want to delete "${catalogue.name}"?`)) {
+      deleteCatalogue(catalogue.id);
+    }
+  };
 
   if (catalogues.length === 0) {
     return (
@@ -78,10 +85,20 @@ export default function CatalogueListView({ catalogues }) {
 
             {hasPermission('edit') && (
               <div style={{ display: 'flex', gap: '8px' }}>
-                <Button size="small" variant="secondary" fullWidth>
+                <Button
+                  size="small"
+                  variant="secondary"
+                  fullWidth
+                  onClick={() => selectCatalogue(catalogue)}
+                >
                   ✏️ Edit
                 </Button>
-                <Button size="small" variant="danger" fullWidth>
+                <Button
+                  size="small"
+                  variant="danger"
+                  fullWidth
+                  onClick={() => handleDeleteCatalogue(catalogue)}
+                >
                   🗑️ Delete
                 </Button>
               </div>
