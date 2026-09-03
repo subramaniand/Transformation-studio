@@ -1,0 +1,12 @@
+# Run these commands in PowerShell or Terminal from C:\transformation-studio
+
+# 1. Add your GitHub repository as remote
+git remote add origin https://github.com/subramaniand/transformation-studio.git
+
+# 2. Rename branch to main (if needed)
+git branch -M main
+
+# 3. Push to GitHub
+git push -u origin main
+
+# That's it! Your repo is now on GitHub
