@@ -3,7 +3,8 @@
     "allow": [
       "Bash(gh repo *)",
       "Bash(npm run *)",
-      "Bash(awk '{print $NF}')"
+      "Bash(awk '{print $NF}')",
+      "Bash(curl -s http://localhost:5173)"
     ]
   }
 }
