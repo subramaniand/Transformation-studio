@@ -1,4 +1,4 @@
-name: Build and Deploy
+name: Build
 
 on:
   push:
@@ -23,9 +23,5 @@ jobs:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
 
-      - run: |
-          git config user.email "actions@github.com"
-          git config user.name "GitHub Actions"
-          git add docs
-          git commit -m "build: update deployed app" || true
-          git push
+      - name: Verify build
+        run: ls -la docs/
