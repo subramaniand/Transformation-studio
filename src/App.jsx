@@ -1,27 +1,42 @@
+import { useState, useEffect } from 'react';
+import { useAuthStore } from './authStore';
 import './App.css';
-
-console.log('App component loaded');
+import LoginShell from './components/LoginShell';
+import Sidebar from './components/Sidebar';
+import Topbar from './components/Topbar';
+import Content from './components/Content';
 
 export default function App() {
-  console.log('App rendering...');
+  const user = useAuthStore(state => state.user);
+  const restoreSession = useAuthStore(state => state.restoreSession);
+  const restoreTheme = useAuthStore(state => state.restoreTheme);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [activeModule, setActiveModule] = useState('pricing');
+
+  useEffect(() => {
+    try {
+      restoreSession();
+      restoreTheme();
+    } catch (err) {
+      console.error('Error restoring session:', err);
+    }
+  }, []);
+
+  if (!user) {
+    return <LoginShell />;
+  }
 
   return (
-    <div style={{
-      background: '#0f1419',
-      color: '#e0e0f0',
-      minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      fontFamily: 'system-ui, sans-serif',
-      flexDirection: 'column',
-      gap: '20px'
-    }}>
-      <h1>✓ Transformation Studio</h1>
-      <p style={{ fontSize: '18px' }}>Login Page Coming Next</p>
-      <div style={{ fontSize: '12px', color: '#888', marginTop: '20px' }}>
-        <p>App is fully functional</p>
-        <p>Repository: <a href="https://github.com/subramaniand/Transformation-studio" style={{color: '#00d4ff'}}>GitHub Link</a></p>
+    <div className={`app ${sidebarCollapsed ? 'sb-collapsed' : ''}`}>
+      <Sidebar
+        collapsed={sidebarCollapsed}
+        onCollapse={setSidebarCollapsed}
+        activeModule={activeModule}
+        onModuleChange={setActiveModule}
+      />
+      <div className="main">
+        <Topbar />
+        <Content module={activeModule} />
       </div>
     </div>
   );
