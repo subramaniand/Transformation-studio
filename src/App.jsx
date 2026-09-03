@@ -13,11 +13,21 @@ export default function App() {
   const restoreTheme = useAuthStore(state => state.restoreTheme);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [activeModule, setActiveModule] = useState('pricing');
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    restoreSession();
-    restoreTheme();
-  }, []);
+    try {
+      restoreSession();
+      restoreTheme();
+    } catch (err) {
+      console.error('Error restoring session:', err);
+      setError(err.message);
+    }
+  }, [restoreSession, restoreTheme]);
+
+  if (error) {
+    return <div style={{ color: '#ff7070', padding: '20px' }}>Error: {error}</div>;
+  }
 
   if (!user) {
     return <LoginShell />;
