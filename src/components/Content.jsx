@@ -111,6 +111,7 @@ export default function Content({ module }) {
 
   // DELIVERY PLANNER VIEW
   if (module === 'planner') {
+    console.log('Rendering Delivery Planner');
     return (
       <div className="content">
         <div style={{ maxWidth: '1200px' }}>
@@ -121,16 +122,16 @@ export default function Content({ module }) {
             </p>
           </div>
 
-          {/* Planner Options */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px', marginBottom: '24px' }}>
+          {/* Planner Options Grid */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px', marginBottom: '24px' }}>
             {[
               { icon: '🗂', title: 'WBS', desc: 'Work Breakdown Structure' },
               { icon: '👥', title: 'Team', desc: 'Team & Roles' },
               { icon: '📅', title: 'Gantt', desc: 'Timeline / Gantt Chart' },
               { icon: '🎯', title: 'RACI', desc: 'RACI Matrix' }
-            ].map((item, i) => (
-              <div
-                key={i}
+            ].map((item) => (
+              <button
+                key={item.title}
                 style={{
                   background: 'var(--bg2)',
                   border: '1px solid var(--bd)',
@@ -140,24 +141,36 @@ export default function Content({ module }) {
                   transition: '0.2s',
                   textAlign: 'center'
                 }}
-                onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--ac)'}
-                onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--bd)'}
+                onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--ac)'}
+                onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--bd)'}
               >
                 <div style={{ fontSize: '28px', marginBottom: '8px' }}>{item.icon}</div>
                 <div style={{ fontSize: '12px', fontWeight: '600', marginBottom: '2px' }}>{item.title}</div>
                 <div style={{ fontSize: '10px', color: 'var(--tx3)' }}>{item.desc}</div>
-              </div>
+              </button>
             ))}
           </div>
 
-          {/* Placeholder */}
-          <div className="empty" style={{ height: '300px' }}>
-            <div style={{ fontSize: '48px', marginBottom: '16px' }}>📅</div>
-            <div style={{ fontSize: '16px', fontWeight: '600', color: '#fff' }}>
-              Delivery Planner
-            </div>
-            <div style={{ fontSize: '13px', color: 'var(--tx3)', marginTop: '8px' }}>
-              Select a planning view above or create a new project
+          {/* Project Overview */}
+          <div style={{ background: 'var(--bg2)', border: '1px solid var(--bd)', borderRadius: '12px', padding: '20px' }}>
+            <h3 style={{ margin: '0 0 16px', fontSize: '14px', fontWeight: '600' }}>Project Overview</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '16px' }}>
+              <div>
+                <div style={{ fontSize: '11px', color: 'var(--tx3)', marginBottom: '4px' }}>Total Duration</div>
+                <div style={{ fontSize: '18px', fontWeight: '600', color: 'var(--ac)' }}>16 weeks</div>
+              </div>
+              <div>
+                <div style={{ fontSize: '11px', color: 'var(--tx3)', marginBottom: '4px' }}>Team Members</div>
+                <div style={{ fontSize: '18px', fontWeight: '600', color: 'var(--grn)' }}>12 people</div>
+              </div>
+              <div>
+                <div style={{ fontSize: '11px', color: 'var(--tx3)', marginBottom: '4px' }}>Milestones</div>
+                <div style={{ fontSize: '18px', fontWeight: '600', color: 'var(--gold)' }}>5 phases</div>
+              </div>
+              <div>
+                <div style={{ fontSize: '11px', color: 'var(--tx3)', marginBottom: '4px' }}>Status</div>
+                <div style={{ fontSize: '18px', fontWeight: '600', color: 'var(--grn)' }}>On Track</div>
+              </div>
             </div>
           </div>
         </div>

@@ -172,9 +172,6 @@ export default function Sidebar({ collapsed, onCollapse, activeModule, onModuleC
         {hasPermission('create') && (
           <button className="sb-btn sb-new">+ New catalogue</button>
         )}
-        {hasPermission('admin') && (
-          <button className="sb-btn sb-adm">⚙ Admin Panel</button>
-        )}
       </div>
     </div>
   );
