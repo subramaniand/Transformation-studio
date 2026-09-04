@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useAuthStore } from '../authStore';
+import { canAccessModule, useAuthStore } from '../authStore';
 import { usePricingStore } from '../pricingStore';
 import { usePlannerStore } from '../plannerStore';
 
@@ -95,13 +95,15 @@ export default function Sidebar({ collapsed, onCollapse, activeModule, onModuleC
           <span className="sb-nav-ico">💰</span>
           <span>Pricing Catalogue</span>
         </button>
-        <button
-          className={`sb-nav-item ${activeModule === 'planner' ? 'on' : ''}`}
-          onClick={() => onModuleChange('planner')}
-        >
-          <span className="sb-nav-ico">📅</span>
-          <span>Delivery Planner</span>
-        </button>
+        {canAccessModule(user, 'planner') && (
+          <button
+            className={`sb-nav-item ${activeModule === 'planner' ? 'on' : ''}`}
+            onClick={() => onModuleChange('planner')}
+          >
+            <span className="sb-nav-ico">📅</span>
+            <span>Delivery Planner</span>
+          </button>
+        )}
         {hasPermission('admin') && (
           <button
             className={`sb-nav-item ${activeModule === 'admin' ? 'on' : ''}`}
@@ -147,7 +149,7 @@ export default function Sidebar({ collapsed, onCollapse, activeModule, onModuleC
       )}
 
       {/* PLANNER: view nav */}
-      {activeModule === 'planner' && (
+      {activeModule === 'planner' && canAccessModule(user, 'planner') && (
         <div id="planner-nav" style={{ padding: '11px 16px 4px', fontSize: '9.5px' }}>
           <div className="sb-sec">Planner Views</div>
           <div style={{ padding: '0 8px' }}>

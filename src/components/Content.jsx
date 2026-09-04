@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useAuthStore } from '../authStore';
+import { canAccessModule, useAuthStore } from '../authStore';
 import { usePricingStore } from '../pricingStore';
 import { usePlannerStore } from '../plannerStore';
 import { useAdminStore } from '../adminStore';
@@ -11,6 +11,10 @@ export default function Content({ module }) {
   const user = useAuthStore(state => state.user);
   const hasPermission = useAuthStore(state => state.hasPermission);
   const currentCatalogue = usePricingStore(state => state.currentCatalogue);
+
+  if (!canAccessModule(user, module)) {
+    return <PricingModule />;
+  }
 
   // Use new modular components
   if (module === 'pricing') {

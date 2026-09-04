@@ -15,12 +15,18 @@ const ROLE_PERMISSIONS = {
   viewer: { edit: 0, admin: 0, del: 0, create: 0, export: 1 },
 };
 
+export const normalizeRole = (role) => String(role || '').trim().toLowerCase();
+
+export const isFinanceController = (user) => normalizeRole(user?.role) === 'finance controller';
+
+export const canAccessModule = (user, module) => module !== 'planner' || !isFinanceController(user);
+
 export const useAuthStore = create((set, get) => ({
   user: null,
   users: DEMO_USERS,
   isLoading: false,
   error: null,
-  theme: 'ust-light',
+  theme: 'default',
 
   // Login user
   login: async (username, password) => {

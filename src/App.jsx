@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useAuthStore } from './authStore';
+import { useEffect, useState } from 'react';
+import { canAccessModule, useAuthStore } from './authStore';
 import { ModalProvider } from './context/ModalContext';
 import './App.css';
 import LoginShell from './components/LoginShell';
@@ -12,6 +12,11 @@ export default function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [activeModule, setActiveModule] = useState('pricing');
 
+  useEffect(() => {
+    setActiveModule('pricing');
+    setSidebarCollapsed(false);
+  }, [user]);
+
   if (!user) {
     return <LoginShell />;
   }
@@ -23,7 +28,9 @@ export default function App() {
           collapsed={sidebarCollapsed}
           onCollapse={setSidebarCollapsed}
           activeModule={activeModule}
-          onModuleChange={setActiveModule}
+          onModuleChange={(module) => {
+            if (canAccessModule(user, module)) setActiveModule(module);
+          }}
         />
         <div className="main">
           <Topbar />

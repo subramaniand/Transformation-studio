@@ -1,6 +1,7 @@
 /**
  * ParametersView - Edit pricing parameters
  */
+import { useState } from 'react';
 import { usePricingStore } from '../../../pricingStore';
 import { useAuthStore } from '../../../authStore';
 import Card from '../../../components/ui/Card';
@@ -12,11 +13,18 @@ export default function ParametersView() {
   const parameterGroups = usePricingStore(state => state.parameterGroups);
   const parameters = usePricingStore(state => state.parameters);
   const updateCatalogueParameters = usePricingStore(state => state.updateCatalogueParameters);
+  const updateCatalogueTier = usePricingStore(state => state.updateCatalogueTier);
   const hasPermission = useAuthStore(state => state.hasPermission);
+  const [activeGroupId, setActiveGroupId] = useState(parameterGroups[0]?.id);
 
   if (!currentCatalogue) {
     return <div>No catalogue selected</div>;
   }
+
+  const tiers = currentCatalogue.tiers?.length ? currentCatalogue.tiers : [];
+  const selectedTier = tiers[currentCatalogue.tier] || tiers[0];
+  const activeGroup = parameterGroups.find(group => group.id === activeGroupId) || parameterGroups[0];
+  const groupParams = parameters.filter(parameter => parameter.groupId === activeGroup?.id);
 
   const handleParameterChange = (parameterId, value) => {
     const updatedParams = {
@@ -32,14 +40,54 @@ export default function ParametersView() {
 
   return (
     <div style={{ padding: '20px' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '20px' }}>
-        {parameterGroups.map((group) => {
-          const groupParams = parameters.filter(p => p.groupId === group.id);
-          if (groupParams.length === 0) return null;
+      <div className="pricing-score-header">
+        <div className="pricing-score-ring">{(currentCatalogue.tier || 0) + 1}</div>
+        <div className="pricing-score-title">
+          <div className="pricing-score-tier">{selectedTier?.name || 'Complexity'}</div>
+          <div className="pricing-score-meta">{Object.keys(currentCatalogue.parameters || {}).length} params · updated from catalogue</div>
+        </div>
+        <div className="pricing-score-metrics">
+          <div><span>Cost range</span><strong>${(selectedTier?.costLo || 0).toLocaleString()} - ${(selectedTier?.costHi || 0).toLocaleString()}</strong></div>
+          <div><span>Timeline</span><strong>{selectedTier?.timeline || 'Not set'}</strong></div>
+          <div><span>Team</span><strong>{selectedTier?.team || 'Not set'} people</strong></div>
+        </div>
+      </div>
 
-          return (
-            <Card key={group.id} title={`📊 ${group.name}`}>
-              {groupParams.map((param) => {
+      {tiers.length > 0 && (
+        <div className="complexity-tabs" aria-label="Complexity tiers">
+          {tiers.map((tier, index) => (
+            <button
+              key={tier.id || tier.name}
+              className={currentCatalogue.tier === index ? 'active' : ''}
+              onClick={() => hasPermission('edit') && updateCatalogueTier(currentCatalogue.id, index)}
+              disabled={!hasPermission('edit')}
+              style={{ '--tier-color': tier.color || 'var(--ac)' }}
+            >
+              <span className="complexity-dot" />
+              {tier.name}
+              <small>${(tier.costLo || 0).toLocaleString()} - ${(tier.costHi || 0).toLocaleString()}</small>
+            </button>
+          ))}
+        </div>
+      )}
+
+      <div className="param-layout">
+        <div className="grp-nav">
+          {parameterGroups.map(group => (
+            <button
+              key={group.id}
+              className={`grp-btn ${activeGroup?.id === group.id ? 'on' : ''}`}
+              onClick={() => setActiveGroupId(group.id)}
+            >
+              <span className="grp-ico">{group.icon}</span>
+              <span className="grp-lbl">{group.name}</span>
+              <span className="grp-cnt">{parameters.filter(parameter => parameter.groupId === group.id && currentCatalogue.parameters?.[parameter.id] !== undefined).length || ''}</span>
+            </button>
+          ))}
+        </div>
+
+        <Card title={`${activeGroup?.icon || '📊'} ${activeGroup?.name || 'Parameters'}`}>
+          {groupParams.map((param) => {
                 const currentValue = currentCatalogue.parameters?.[param.id] ?? param.defaultValue;
 
                 return (
@@ -63,10 +111,9 @@ export default function ParametersView() {
                     helperText={param.type === 'currency' ? 'USD' : param.type === 'number' ? `Min: ${param.min}, Max: ${param.max}` : ''}
                   />
                 );
-              })}
-            </Card>
-          );
-        })}
+          })}
+          {groupParams.length === 0 && <div style={{ color: 'var(--tx3)', fontSize: '12px' }}>No parameters in this group.</div>}
+        </Card>
       </div>
 
       {hasPermission('edit') && (

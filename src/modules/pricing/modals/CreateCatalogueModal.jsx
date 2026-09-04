@@ -7,7 +7,16 @@ import { useModal } from '../../../context/ModalContext';
 import Button from '../../../components/ui/Button';
 import FormField from '../../../components/ui/FormField';
 
-const CATALOGUE_TYPES = ['Migration', 'App Development', 'Data Architecture', 'Security', 'Consulting'];
+const CATALOGUE_TYPES = [
+  'DC Exit',
+  'App Development',
+  'Landing Zone',
+  'Data Architecture',
+  'Integration',
+  'Strategy & APR',
+  'Migration',
+  'Custom',
+];
 
 export default function CreateCatalogueModal() {
   const modals = useModal().modals;

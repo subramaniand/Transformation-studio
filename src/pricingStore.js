@@ -2,45 +2,87 @@ import { create } from 'zustand';
 import { isSupabaseConfigured, supabase } from './supabaseClient';
 
 const DEMO_TIERS = [
-  { id: '1', name: 'Standard', costMultiplier: 1, color: '#004b87', description: 'Standard implementation' },
-  { id: '2', name: 'Premium', costMultiplier: 1.5, color: '#e67e22', description: 'Premium with enhancements' },
-  { id: '3', name: 'Enterprise', costMultiplier: 2.5, color: '#27ae60', description: 'Full enterprise solution' },
+  { id: '1', name: 'Very Simple', costMultiplier: 0.5, costLo: 50000, costHi: 100000, timeline: '4-8 weeks', team: '2-4', color: '#1a9e6e', description: 'Low-complexity change' },
+  { id: '2', name: 'Simple', costMultiplier: 1, costLo: 100000, costHi: 250000, timeline: '8-16 weeks', team: '4-8', color: '#4a9d3f', description: 'Straightforward delivery' },
+  { id: '3', name: 'Medium', costMultiplier: 2.5, costLo: 300000, costHi: 700000, timeline: '4-6 months', team: '8-14', color: '#c97b00', description: 'Moderate transformation' },
+  { id: '4', name: 'Complex', costMultiplier: 7, costLo: 800000, costHi: 2000000, timeline: '9-15 months', team: '15-25', color: '#c05020', description: 'Complex enterprise change' },
+  { id: '5', name: 'Very Complex', costMultiplier: 15, costLo: 2500000, costHi: 7000000, timeline: '18-36 months', team: '25-50', color: '#a32d2d', description: 'Large-scale transformation' },
 ];
 
 const DEMO_PARAMETER_GROUPS = [
-  { id: 'g1', name: 'Base Parameters', order: 1 },
-  { id: 'g2', name: 'Team Allocation', order: 2 },
-  { id: 'g3', name: 'Risk & Quality', order: 3 },
-  { id: 'g4', name: 'Infrastructure', order: 4 },
+  { id: 'g1', name: 'Scale & Users', order: 1, icon: '👥' },
+  { id: 'g2', name: 'Application Portfolio', order: 2, icon: '🗂' },
+  { id: 'g3', name: 'Integration', order: 3, icon: '🔗' },
+  { id: 'g4', name: 'Data & Infra', order: 4, icon: '🗄' },
+  { id: 'g5', name: 'Security & Compliance', order: 5, icon: '🔒' },
+  { id: 'g6', name: 'AI & ML', order: 6, icon: '🧠' },
+  { id: 'g7', name: 'Testing & QA', order: 7, icon: '✅' },
+  { id: 'g8', name: 'Change & Cutover', order: 8, icon: '🚀' },
+  { id: 'g9', name: 'M&A Context', order: 9, icon: '🤝' },
 ];
 
 const DEMO_PARAMETERS = [
-  { id: 'p1', groupId: 'g1', name: 'Base Cost', type: 'currency', defaultValue: 25000, min: 5000, max: 500000 },
-  { id: 'p2', groupId: 'g1', name: 'Implementation Days', type: 'number', defaultValue: 90, min: 30, max: 365 },
-  { id: 'p3', groupId: 'g2', name: 'Team Size', type: 'number', defaultValue: 5, min: 1, max: 50 },
-  { id: 'p4', groupId: 'g2', name: 'Daily Rate per Person', type: 'currency', defaultValue: 1000, min: 500, max: 3000 },
-  { id: 'p5', groupId: 'g3', name: 'Risk Level', type: 'select', defaultValue: 'medium', options: ['low', 'medium', 'high'] },
-  { id: 'p6', groupId: 'g3', name: 'Quality Multiplier', type: 'number', defaultValue: 1.0, min: 0.5, max: 2.0 },
-  { id: 'p7', groupId: 'g4', name: 'Infrastructure Cost', type: 'currency', defaultValue: 10000, min: 0, max: 100000 },
+  { id: 'p1', groupId: 'g1', name: 'Total users', type: 'number', defaultValue: 200, min: 0, max: 100000 },
+  { id: 'p2', groupId: 'g1', name: 'Concurrent users', type: 'number', defaultValue: 80, min: 0, max: 100000 },
+  { id: 'p3', groupId: 'g1', name: 'Geographic regions', type: 'number', defaultValue: 2, min: 1, max: 100 },
+  { id: 'p4', groupId: 'g1', name: 'Business units', type: 'number', defaultValue: 3, min: 1, max: 100 },
+  { id: 'p5', groupId: 'g2', name: 'Total applications', type: 'number', defaultValue: 15, min: 0, max: 10000 },
+  { id: 'p6', groupId: 'g2', name: 'Custom-built apps', type: 'number', defaultValue: 8, min: 0, max: 10000 },
+  { id: 'p7', groupId: 'g2', name: 'COTS products', type: 'number', defaultValue: 3, min: 0, max: 10000 },
+  { id: 'p8', groupId: 'g2', name: 'Legacy / mainframe', type: 'number', defaultValue: 2, min: 0, max: 10000 },
+  { id: 'p9', groupId: 'g2', name: 'Codebase (KLOC)', type: 'number', defaultValue: 50, min: 0, max: 100000 },
+  { id: 'p10', groupId: 'g3', name: 'Internal integrations', type: 'number', defaultValue: 10, min: 0, max: 10000 },
+  { id: 'p11', groupId: 'g3', name: '3rd-party APIs', type: 'number', defaultValue: 5, min: 0, max: 10000 },
+  { id: 'p12', groupId: 'g3', name: 'COTS integrations', type: 'number', defaultValue: 2, min: 0, max: 10000 },
+  { id: 'p13', groupId: 'g3', name: 'Upstream dependencies', type: 'number', defaultValue: 4, min: 0, max: 10000 },
+  { id: 'p14', groupId: 'g3', name: 'Downstream dependencies', type: 'number', defaultValue: 4, min: 0, max: 10000 },
+  { id: 'p15', groupId: 'g4', name: 'Data volume (TB)', type: 'number', defaultValue: 10, min: 0, max: 100000 },
+  { id: 'p16', groupId: 'g4', name: 'Servers / VMs', type: 'number', defaultValue: 50, min: 0, max: 100000 },
+  { id: 'p17', groupId: 'g4', name: 'Databases', type: 'number', defaultValue: 8, min: 0, max: 10000 },
+  { id: 'p18', groupId: 'g4', name: 'Environments', type: 'number', defaultValue: 4, min: 1, max: 100 },
+  { id: 'p19', groupId: 'g4', name: 'Cloud providers', type: 'number', defaultValue: 1, min: 1, max: 10 },
+  { id: 'p20', groupId: 'g5', name: 'Compliance frameworks', type: 'number', defaultValue: 2, min: 0, max: 100 },
+  { id: 'p21', groupId: 'g5', name: 'Data classification', type: 'number', defaultValue: 3, min: 1, max: 10 },
+  { id: 'p22', groupId: 'g5', name: 'Identity providers', type: 'number', defaultValue: 1, min: 1, max: 20 },
+  { id: 'p23', groupId: 'g5', name: 'Security posture', type: 'select', defaultValue: 'Standard', options: ['Basic', 'Standard', 'Enhanced', 'Advanced', 'Military-grade'] },
+  { id: 'p24', groupId: 'g6', name: 'AI use cases', type: 'number', defaultValue: 0, min: 0, max: 1000 },
+  { id: 'p25', groupId: 'g6', name: 'Custom ML models', type: 'number', defaultValue: 0, min: 0, max: 1000 },
+  { id: 'p26', groupId: 'g6', name: 'MLOps maturity', type: 'select', defaultValue: 'None', options: ['None', 'Basic', 'Standard', 'Advanced', 'Full MLOps'] },
+  { id: 'p27', groupId: 'g7', name: 'Test automation (%)', type: 'number', defaultValue: 40, min: 0, max: 100 },
+  { id: 'p28', groupId: 'g7', name: 'Performance test scenarios', type: 'number', defaultValue: 4, min: 0, max: 1000 },
+  { id: 'p29', groupId: 'g7', name: 'Regression cycle (weeks)', type: 'number', defaultValue: 2, min: 0, max: 100 },
+  { id: 'p30', groupId: 'g8', name: 'Cutover strategy', type: 'select', defaultValue: 'Phased', options: ['Big bang', 'Phased', 'Parallel run', 'Strangler fig', 'Canary'] },
+  { id: 'p31', groupId: 'g8', name: 'Rollback complexity', type: 'select', defaultValue: 'Standard', options: ['Simple', 'Standard', 'Complex', 'Very complex', 'Near impossible'] },
+  { id: 'p32', groupId: 'g8', name: 'Training hours / user', type: 'number', defaultValue: 4, min: 0, max: 100 },
+  { id: 'p33', groupId: 'g9', name: 'Duplicate systems', type: 'number', defaultValue: 0, min: 0, max: 1000 },
+  { id: 'p34', groupId: 'g9', name: 'Operating models', type: 'number', defaultValue: 1, min: 1, max: 100 },
+  { id: 'p35', groupId: 'g9', name: 'Legal entities', type: 'number', defaultValue: 1, min: 1, max: 100 },
 ];
 
 const DEMO_CATALOGUES = [
   {
     id: '1',
-    name: 'Cloud Migration (Tier 1)',
-    type: 'Migration',
-    tier: 0,
-    description: 'Basic cloud infrastructure setup',
+    name: 'DC Exit Programme',
+    type: 'DC Exit',
+    tier: 3,
+    description: 'Data centre exit and continuity transformation',
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     parameters: {
-      'p1': 25000,
-      'p2': 90,
-      'p3': 5,
-      'p4': 1000,
-      'p5': 'medium',
-      'p6': 1.0,
-      'p7': 10000,
+      p1: 994,
+      p2: 220,
+      p3: 6,
+      p4: 3,
+      p5: 40,
+      p6: 20,
+      p7: 4,
+      p8: 2,
+      p9: 65,
+      p10: 12,
+      p11: 8,
+      p12: 3,
+      p13: 5,
+      p14: 7,
     },
     tiers: DEMO_TIERS,
     estimates: [
@@ -62,7 +104,7 @@ const DEMO_CATALOGUES = [
   },
   {
     id: '2',
-    name: 'App Development Platform',
+    name: 'App Development',
     type: 'App Development',
     tier: 1,
     description: 'Full application development stack',
@@ -82,20 +124,82 @@ const DEMO_CATALOGUES = [
   },
   {
     id: '3',
-    name: 'Data Lake Architecture',
+    name: 'AWS Landing Zone',
+    type: 'Landing Zone',
+    tier: 2,
+    description: 'Cloud landing zone and platform foundation',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    parameters: { p1: 300, p2: 120, p3: 4, p4: 2, p5: 20, p6: 12, p7: 2 },
+    tiers: DEMO_TIERS,
+    estimates: [],
+  },
+  {
+    id: '4',
+    name: 'Data Architecture',
     type: 'Data Architecture',
     tier: 2,
-    description: 'Enterprise data architecture setup',
+    description: 'Enterprise data architecture and modernisation',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    parameters: { p1: 800, p2: 180, p3: 5, p4: 3, p15: 120, p17: 18, p19: 2 },
+    tiers: DEMO_TIERS,
+    estimates: [],
+  },
+  {
+    id: '5',
+    name: 'Integration Services',
+    type: 'Integration',
+    tier: 1,
+    description: 'Integration estate simplification and delivery',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    parameters: { p1: 120, p2: 80, p10: 18, p11: 12, p13: 8, p14: 10 },
+    tiers: DEMO_TIERS,
+    estimates: [],
+  },
+  {
+    id: '6',
+    name: 'Strategy & APR',
+    type: 'Strategy & APR',
+    tier: 1,
+    description: 'Strategy, assessment and planning roadmap',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    parameters: { p1: 60, p2: 30, p3: 2, p4: 2 },
+    tiers: DEMO_TIERS,
+    estimates: [],
+  },
+  {
+    id: '7',
+    name: 'AI Transformation',
+    type: 'Custom',
+    tier: 2,
+    description: 'AI and ML adoption across the enterprise',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    parameters: { p1: 20, p2: 6, p24: 5, p25: 2, p26: 'Standard' },
+    tiers: DEMO_TIERS,
+    estimates: [],
+  },
+  {
+    id: '8',
+    name: 'Migration',
+    type: 'Migration',
+    tier: 2,
+    description: 'Application and platform migration delivery',
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     parameters: {
-      'p1': 75000,
-      'p2': 120,
-      'p3': 10,
-      'p4': 1500,
-      'p5': 'high',
-      'p6': 1.2,
-      'p7': 50000,
+      p1: 450,
+      p2: 150,
+      p3: 6,
+      p4: 4,
+      p5: 30,
+      p6: 10,
+      p7: 4,
+      p8: 3,
+      p9: 80,
     },
     tiers: DEMO_TIERS,
     estimates: [],
@@ -105,7 +209,7 @@ const DEMO_CATALOGUES = [
 const normalizeCatalogue = (catalogue) => ({
   ...catalogue,
   parameters: catalogue.parameters || catalogue.params || {},
-  tiers: catalogue.tiers || DEMO_TIERS,
+  tiers: catalogue.tiers?.length ? catalogue.tiers : DEMO_TIERS,
   estimates: catalogue.estimates || [],
 });
 
@@ -233,6 +337,34 @@ export const usePricingStore = create((set, get) => ({
   // Set current catalogue
   selectCatalogue: (catalogue) => {
     set({ currentCatalogue: catalogue });
+  },
+
+  updateCatalogueTier: async (catalogueId, tier) => {
+    const catalogue = get().catalogues.find(item => item.id === catalogueId);
+    if (!catalogue) return;
+
+    if (isSupabaseConfigured) {
+      const { data, error } = await supabase
+        .from('catalogues')
+        .update({ tier, updated_at: new Date().toISOString() })
+        .eq('id', catalogueId)
+        .select()
+        .single();
+      if (error) throw error;
+      const updatedCatalogue = normalizeCatalogue(data);
+      set(state => ({
+        catalogues: state.catalogues.map(item => item.id === catalogueId ? updatedCatalogue : item),
+        currentCatalogue: state.currentCatalogue?.id === catalogueId ? updatedCatalogue : state.currentCatalogue,
+      }));
+      return updatedCatalogue;
+    }
+
+    const updatedCatalogue = { ...catalogue, tier };
+    set(state => ({
+      catalogues: state.catalogues.map(item => item.id === catalogueId ? updatedCatalogue : item),
+      currentCatalogue: state.currentCatalogue?.id === catalogueId ? updatedCatalogue : state.currentCatalogue,
+    }));
+    return updatedCatalogue;
   },
 
   // View management

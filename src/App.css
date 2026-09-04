@@ -3,20 +3,20 @@
   --brand-blue: #0072bc;
   --brand-sky: #00a3e0;
   --brand-orange: #f58220;
-  --bg: #f4f8fc;
-  --bg2: #ffffff;
-  --bg3: #e8f1f8;
-  --bg4: #d3e2ef;
-  --bd: rgba(0, 61, 130, 0.14);
-  --bd2: rgba(0, 61, 130, 0.24);
-  --tx: #17324d;
-  --tx2: #486278;
-  --tx3: #71879a;
-  --ac: var(--brand-navy);
-  --gold: var(--brand-orange);
-  --grn: #16845b;
-  --amb: #c56a12;
-  --red: #c43d32;
+  --bg: #0f1419;
+  --bg2: #161b22;
+  --bg3: #1a1f28;
+  --bg4: #22272f;
+  --bd: rgba(255, 255, 255, 0.08);
+  --bd2: rgba(255, 255, 255, 0.14);
+  --tx: #e0e0f0;
+  --tx2: rgba(255, 255, 255, 0.55);
+  --tx3: rgba(255, 255, 255, 0.28);
+  --ac: #004b87;
+  --gold: #e67e22;
+  --grn: #27ae60;
+  --amb: #f39c12;
+  --red: #e74c3c;
 }
 
 html.ust-light {
@@ -160,7 +160,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #e8f3fb 0%, #f7fafc 55%, #fff1e7 100%);
+  background: radial-gradient(ellipse at 30% 40%, #1a0e4a, var(--bg) 65%);
 }
 
 .lbox {
@@ -779,4 +779,196 @@ body {
   height: 340px;
   flex-direction: column;
   gap: 9px;
+}
+
+.pricing-score-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 13px 16px;
+  margin-bottom: 12px;
+  background: var(--bg3);
+  border: 1px solid var(--bd);
+  border-radius: 12px;
+}
+
+.pricing-score-ring {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 4px solid var(--gold);
+  border-radius: 50%;
+  color: var(--ac);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.pricing-score-title {
+  flex: 1;
+  min-width: 120px;
+}
+
+.pricing-score-tier {
+  color: var(--gold);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.pricing-score-meta {
+  margin-top: 1px;
+  color: var(--tx3);
+  font-size: 11px;
+}
+
+.pricing-score-metrics {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.pricing-score-metrics div {
+  min-width: 100px;
+  padding: 8px 11px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--bd);
+  border-radius: 9px;
+}
+
+.pricing-score-metrics span,
+.pricing-score-metrics strong {
+  display: block;
+}
+
+.pricing-score-metrics span {
+  color: var(--tx3);
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+.pricing-score-metrics strong {
+  margin-top: 2px;
+  color: var(--tx);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.complexity-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.complexity-tabs button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 145px;
+  padding: 7px 10px;
+  background: transparent;
+  border: 1px solid var(--bd);
+  border-radius: 9px;
+  color: var(--tier-color);
+  cursor: pointer;
+  font-size: 11px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.complexity-tabs button.active {
+  background: color-mix(in srgb, var(--tier-color) 15%, transparent);
+  border-color: var(--tier-color);
+}
+
+.complexity-tabs button:disabled {
+  cursor: default;
+}
+
+.complexity-tabs small {
+  margin-left: auto;
+  color: var(--tx3);
+  font-size: 9px;
+}
+
+.complexity-dot {
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--tier-color);
+}
+
+.param-layout {
+  display: grid;
+  grid-template-columns: 155px minmax(0, 1fr);
+  gap: 11px;
+}
+
+.grp-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.grp-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  padding: 7px 8px;
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+  color: var(--tx2);
+  cursor: pointer;
+  text-align: left;
+}
+
+.grp-btn:hover,
+.grp-btn.on {
+  background: rgba(0, 114, 188, 0.16);
+}
+
+.grp-btn.on .grp-lbl {
+  color: var(--brand-sky);
+}
+
+.grp-ico {
+  width: 19px;
+  text-align: center;
+}
+
+.grp-lbl {
+  flex: 1;
+  font-size: 11px;
+}
+
+.grp-cnt {
+  color: var(--tx3);
+  font-size: 10px;
+}
+
+@media (max-width: 700px) {
+  .pricing-score-header {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .pricing-score-metrics {
+    width: 100%;
+    margin-left: 64px;
+  }
+
+  .param-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .grp-nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
