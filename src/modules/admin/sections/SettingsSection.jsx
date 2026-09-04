@@ -6,11 +6,12 @@ import Card from '../../../components/ui/Card';
 import Button from '../../../components/ui/Button';
 import FormField from '../../../components/ui/FormField';
 import Badge from '../../../components/ui/Badge';
+import { isSupabaseConfigured, testSupabaseConnection } from '../../../supabaseClient';
 
 export default function SettingsSection() {
   const [settings, setSettings] = useState({
-    supabaseUrl: 'https://your-project.supabase.co',
-    supabaseKey: '••••••••••••••••••••••••••••••••••••••••••••••',
+    supabaseUrl: import.meta.env.VITE_SUPABASE_URL || '',
+    supabaseKey: import.meta.env.VITE_SUPABASE_ANON_KEY || '',
     apiEndpoint: 'https://api.transformation-studio.com',
     apiKey: '••••••••••••••••••••••••••••••••••••••••••••••',
     maxUploadSize: 50,
@@ -25,6 +26,8 @@ export default function SettingsSection() {
   const [editSettings, setEditSettings] = useState({ ...settings });
   const [showApiKey, setShowApiKey] = useState(false);
   const [showSupabaseKey, setShowSupabaseKey] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState(isSupabaseConfigured ? 'Configured' : 'Not configured');
+  const [isTestingConnection, setIsTestingConnection] = useState(false);
 
   const handleSave = () => {
     setSettings(editSettings);
@@ -44,6 +47,13 @@ export default function SettingsSection() {
     setEditMode(false);
   };
 
+  const handleTestConnection = async () => {
+    setIsTestingConnection(true);
+    const connected = await testSupabaseConnection();
+    setConnectionStatus(connected ? 'Connected' : 'Connection failed');
+    setIsTestingConnection(false);
+  };
+
   return (
     <div style={{ padding: '20px', maxWidth: '900px' }}>
       {/* Supabase Configuration */}
@@ -53,7 +63,7 @@ export default function SettingsSection() {
           name="supabaseUrl"
           value={editSettings.supabaseUrl}
           onChange={(e) => handleChange('supabaseUrl', e.target.value)}
-          disabled={!editMode}
+          disabled
           placeholder="https://your-project.supabase.co"
         />
 
@@ -80,7 +90,7 @@ export default function SettingsSection() {
             type={showSupabaseKey ? 'text' : 'password'}
             value={editSettings.supabaseKey}
             onChange={(e) => handleChange('supabaseKey', e.target.value)}
-            disabled={!editMode}
+            disabled
             style={{
               width: '100%',
               padding: '8px 12px',
@@ -97,10 +107,24 @@ export default function SettingsSection() {
         </div>
 
         <div style={{ marginTop: '12px', padding: '12px', background: 'var(--bg3)', borderRadius: '6px', fontSize: '11px', color: 'var(--tx3)' }}>
-          <strong>Connection Status:</strong> <Badge variant="success">Connected</Badge>
+          <strong>Connection Status:</strong>{' '}
+          <Badge variant={connectionStatus === 'Connected' ? 'success' : connectionStatus === 'Configured' ? 'warning' : 'danger'}>
+            {connectionStatus}
+          </Badge>
           <div style={{ marginTop: '6px', fontSize: '10px' }}>
-            Last verified: 2 minutes ago
+            {isSupabaseConfigured
+              ? 'Credentials loaded from .env.local'
+              : 'Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to .env.local'}
           </div>
+          <Button
+            variant="secondary"
+            size="small"
+            onClick={handleTestConnection}
+            disabled={isTestingConnection || !isSupabaseConfigured}
+            style={{ marginTop: '10px' }}
+          >
+            {isTestingConnection ? 'Testing...' : 'Test Connection'}
+          </Button>
         </div>
       </Card>
 
@@ -291,7 +315,7 @@ export default function SettingsSection() {
       </div>
 
       <div style={{ marginTop: '20px', padding: '12px', background: 'var(--bg3)', borderRadius: '6px', fontSize: '11px', color: 'var(--tx3)' }}>
-        <strong>Note:</strong> Changes to API configuration will require application restart. System status is updated in real-time.
+        <strong>Note:</strong> Supabase credentials are read from `.env.local`. Update that file and restart the application to change them. System status is updated in real-time.
       </div>
     </div>
   );
