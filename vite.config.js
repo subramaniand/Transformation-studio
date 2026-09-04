@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [react()],
   base: '/Transformation-studio/',
   build: {
-    outDir: 'docs',
+    outDir: 'dist',
     emptyOutDir: true,
   },
   server: {
