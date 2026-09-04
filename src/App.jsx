@@ -33,7 +33,7 @@ export default function App() {
           }}
         />
         <div className="main">
-          <Topbar />
+          <Topbar module={activeModule} />
           <Content module={activeModule} />
         </div>
       </div>

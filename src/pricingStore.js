@@ -219,7 +219,7 @@ export const usePricingStore = create((set, get) => ({
   tiers: DEMO_TIERS,
   parameterGroups: DEMO_PARAMETER_GROUPS,
   parameters: DEMO_PARAMETERS,
-  currentView: 'list',
+  currentView: 'parameters',
   filters: { type: '', tier: null, search: '' },
   isLoading: false,
   error: null,
@@ -240,7 +240,11 @@ export const usePricingStore = create((set, get) => ({
 
       if (error) throw error;
       const catalogues = data?.length ? data.map(normalizeCatalogue) : DEMO_CATALOGUES;
-      set({ catalogues, isLoading: false });
+      set(state => ({
+        catalogues,
+        currentCatalogue: state.currentCatalogue || catalogues[0] || null,
+        isLoading: false,
+      }));
       return catalogues;
     } catch (err) {
       console.error('Error fetching catalogues:', err.message);
@@ -458,15 +462,27 @@ export const usePricingStore = create((set, get) => ({
   },
 
   // Catalogue parameters
-  updateCatalogueParameters: (catalogueId, parameters) => {
+  updateCatalogueParameters: async (catalogueId, parameters) => {
+    const catalogue = get().catalogues.find(item => item.id === catalogueId);
+    if (!catalogue) return;
+
+    const updatedCatalogue = { ...catalogue, parameters };
     set(state => ({
-      catalogues: state.catalogues.map(c =>
-        c.id === catalogueId ? { ...c, parameters } : c
-      ),
+      catalogues: state.catalogues.map(item => item.id === catalogueId ? updatedCatalogue : item),
       currentCatalogue: state.currentCatalogue?.id === catalogueId
-        ? { ...state.currentCatalogue, parameters }
+        ? updatedCatalogue
         : state.currentCatalogue,
     }));
+
+    if (isSupabaseConfigured) {
+      try {
+        await get().updateCatalogue(catalogueId, { parameters });
+      } catch (error) {
+        set({ error: error.message });
+      }
+    }
+
+    return updatedCatalogue;
   },
 
   // Estimate calculator

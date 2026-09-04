@@ -26,10 +26,10 @@ export default function Sidebar({ collapsed, onCollapse, activeModule, onModuleC
   const setActiveView = usePlannerStore(state => state.setActiveView);
 
   useEffect(() => {
-    if (activeModule === 'pricing' && catalogues.length === 0) {
+    if (activeModule === 'pricing') {
       fetchCatalogues();
     }
-  }, [activeModule]);
+  }, [activeModule, fetchCatalogues]);
 
   const getRoleColor = (role) => {
     const colors = {

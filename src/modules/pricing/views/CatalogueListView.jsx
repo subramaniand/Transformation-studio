@@ -2,6 +2,7 @@
  * CatalogueListView - List of pricing catalogues
  */
 import { usePricingStore } from '../../../pricingStore';
+import { useModal } from '../../../context/ModalContext';
 import { useAuthStore } from '../../../authStore';
 import Card from '../../../components/ui/Card';
 import Badge from '../../../components/ui/Badge';
@@ -12,6 +13,7 @@ export default function CatalogueListView({ catalogues }) {
   const deleteCatalogue = usePricingStore(state => state.deleteCatalogue);
   const currentCatalogue = usePricingStore(state => state.currentCatalogue);
   const hasPermission = useAuthStore(state => state.hasPermission);
+  const openModal = useModal().openModal;
 
   const handleDeleteCatalogue = (catalogue) => {
     if (confirm(`Are you sure you want to delete "${catalogue.name}"?`)) {
@@ -89,7 +91,7 @@ export default function CatalogueListView({ catalogues }) {
                   size="small"
                   variant="secondary"
                   fullWidth
-                  onClick={() => selectCatalogue(catalogue)}
+                  onClick={(event) => { event.stopPropagation(); selectCatalogue(catalogue); openModal('editCatalogue', { catalogue }); }}
                 >
                   ✏️ Edit
                 </Button>

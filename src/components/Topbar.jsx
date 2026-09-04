@@ -1,8 +1,11 @@
 import { useAuthStore } from '../authStore';
+import { usePricingStore } from '../pricingStore';
 
-export default function Topbar() {
+export default function Topbar({ module }) {
   const theme = useAuthStore(state => state.theme);
   const setTheme = useAuthStore(state => state.setTheme);
+  const currentView = usePricingStore(state => state.currentView);
+  const setView = usePricingStore(state => state.setView);
 
   return (
     <div className="topbar">
@@ -38,11 +41,13 @@ export default function Topbar() {
         </button>
       </div>
 
-      <div className="pill-nav" id="pricing-pills">
-        <button className="pv on" id="pv-params">Parameters</button>
-        <button className="pv" id="pv-estimate">Estimate</button>
-        <button className="pv" id="pv-json">JSON</button>
-      </div>
+      {module === 'pricing' && (
+        <div className="pill-nav" id="pricing-pills">
+          <button className={`pv ${currentView === 'parameters' ? 'on' : ''}`} onClick={() => setView('parameters')}>Parameters</button>
+          <button className={`pv ${currentView === 'estimate' ? 'on' : ''}`} onClick={() => setView('estimate')}>Estimate</button>
+          <button className={`pv ${currentView === 'json' ? 'on' : ''}`} onClick={() => setView('json')}>JSON</button>
+        </div>
+      )}
 
       <button className="tbtn pri" id="export-btn">Export JSON</button>
     </div>

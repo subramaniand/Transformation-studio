@@ -20,57 +20,29 @@ export default function PricingModule() {
   const catalogues = usePricingStore(state => state.catalogues);
   const currentCatalogue = usePricingStore(state => state.currentCatalogue);
   const selectCatalogue = usePricingStore(state => state.selectCatalogue);
+  const currentView = usePricingStore(state => state.currentView);
+  const setView = usePricingStore(state => state.setView);
   const hasPermission = useAuthStore(state => state.hasPermission);
   const openModal = useModal().openModal;
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeViewTab, setActiveViewTab] = useState('list');
 
   const filteredCatalogues = catalogues.filter(c =>
     c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     c.type.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleTabChange = (tab) => {
-    setActiveViewTab(tab.id);
+  const renderView = () => {
+    if (currentView === 'list') return <CatalogueListView catalogues={filteredCatalogues} />;
+    if (currentView === 'estimate') return currentCatalogue ? <EstimateView /> : <Card title="Select Catalogue" />;
+    if (currentView === 'json') return <JSONExportView />;
+    return currentCatalogue ? <ParametersView /> : <Card title="Select Catalogue" />;
   };
 
   const tabs = [
-    {
-      id: 'list',
-      label: '📋 Catalogues',
-      render: () => <CatalogueListView catalogues={filteredCatalogues} />,
-    },
-    {
-      id: 'parameters',
-      label: '⚙️ Parameters',
-      render: () => currentCatalogue ? <ParametersView /> : (
-        <div style={{ padding: '20px' }}>
-          <Card title="Select Catalogue">
-            <p style={{ margin: '0', color: 'var(--tx3)' }}>
-              Please select a catalogue from the list to view and edit parameters
-            </p>
-          </Card>
-        </div>
-      ),
-    },
-    {
-      id: 'estimate',
-      label: '💰 Estimates',
-      render: () => currentCatalogue ? <EstimateView /> : (
-        <div style={{ padding: '20px' }}>
-          <Card title="Select Catalogue">
-            <p style={{ margin: '0', color: 'var(--tx3)' }}>
-              Please select a catalogue from the list to view and create estimates
-            </p>
-          </Card>
-        </div>
-      ),
-    },
-    {
-      id: 'export',
-      label: '📤 Export',
-      render: () => <JSONExportView />,
-    },
+    { id: 'list', label: '📋 Catalogues' },
+    { id: 'parameters', label: '⚙️ Parameters' },
+    { id: 'estimate', label: '💰 Estimates' },
+    { id: 'json', label: '📤 Export' },
   ];
 
   return (
@@ -127,12 +99,20 @@ export default function PricingModule() {
           borderRadius: '12px',
           overflow: 'hidden',
         }}>
-          <Tabs
-            tabs={tabs}
-            defaultActive={0}
-            onChange={handleTabChange}
-            variant="line"
-          />
+          <div className="pricing-tabs" role="tablist">
+            {tabs.map(tab => (
+              <button
+                key={tab.id}
+                className={currentView === tab.id || (tab.id === 'list' && currentView === 'parameters' && false) ? 'active' : ''}
+                onClick={() => setView(tab.id)}
+                role="tab"
+                aria-selected={currentView === tab.id}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+          <div className="pricing-view-content">{renderView()}</div>
         </div>
       </div>
 

@@ -902,6 +902,32 @@ body {
   background: var(--tier-color);
 }
 
+.pricing-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--bd);
+}
+
+.pricing-tabs button {
+  padding: 12px 16px;
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  color: var(--tx2);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.pricing-tabs button.active {
+  border-bottom-color: var(--ac);
+  color: var(--ac);
+}
+
+.pricing-view-content {
+  padding-top: 16px;
+}
+
 .param-layout {
   display: grid;
   grid-template-columns: 155px minmax(0, 1fr);
