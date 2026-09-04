@@ -84,6 +84,15 @@ const DEMO_ROLES = [
   },
 ];
 
+const normalizeAuditLog = (log) => ({
+  ...log,
+  userId: log.userId || log.user_id,
+  resource: log.resource || log.resource_type,
+  resourceId: log.resourceId || log.resource_id,
+  details: log.details || log.detail,
+  timestamp: log.timestamp,
+});
+
 export const useAdminStore = create((set, get) => ({
   roles: DEMO_ROLES,
   auditLogs: DEMO_AUDIT_LOGS,
@@ -101,20 +110,21 @@ export const useAdminStore = create((set, get) => ({
       let query = supabase.from('audit_logs').select('*');
 
       if (filters.userId) {
-        query = query.eq('userId', filters.userId);
+        query = query.eq('user_id', filters.userId);
       }
       if (filters.action) {
         query = query.eq('action', filters.action);
       }
       if (filters.resource) {
-        query = query.eq('resource', filters.resource);
+        query = query.eq('resource_type', filters.resource);
       }
 
       const { data, error } = await query.order('timestamp', { ascending: false });
 
       if (error) throw error;
-      set({ auditLogs: data || DEMO_AUDIT_LOGS, isLoading: false });
-      return data || DEMO_AUDIT_LOGS;
+      const logs = data?.length ? data.map(normalizeAuditLog) : DEMO_AUDIT_LOGS;
+      set({ auditLogs: logs, isLoading: false });
+      return logs;
     } catch (err) {
       console.warn('Could not fetch audit logs, using demo data:', err.message);
       set({ auditLogs: DEMO_AUDIT_LOGS, isLoading: false });
@@ -312,8 +322,16 @@ export const useAdminStore = create((set, get) => ({
       return localRole;
     }
 
-    const { data, error } = await supabase.from('roles').insert([newRole]).select().single();
-    if (error) throw error;
+    let { data, error } = await supabase.from('roles').insert([newRole]).select().single();
+    if (error) {
+      const fallback = await supabase
+        .from('roles')
+        .insert([{ name: newRole.name }])
+        .select()
+        .single();
+      if (fallback.error) throw error;
+      data = fallback.data;
+    }
     const roles = [...get().roles, data];
     set({ roles });
     return data;
@@ -321,9 +339,19 @@ export const useAdminStore = create((set, get) => ({
 
   updateRole: async (roleId, updates) => {
     if (isSupabaseConfigured) {
-      const { data, error } = await supabase.from('roles').update(updates).eq('id', roleId).select().single();
-      if (error) throw error;
-      updates = data;
+      const result = await supabase.from('roles').update(updates).eq('id', roleId).select().single();
+      if (result.error) {
+        const fallback = await supabase
+          .from('roles')
+          .update({ name: updates.name })
+          .eq('id', roleId)
+          .select()
+          .single();
+        if (fallback.error) throw result.error;
+        updates = fallback.data;
+      } else {
+        updates = result.data;
+      }
     }
     const roles = get().roles.map(role => role.id === roleId ? { ...role, ...updates } : role);
     set({ roles });

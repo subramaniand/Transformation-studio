@@ -42,7 +42,37 @@ CREATE TABLE IF NOT EXISTS catalogues (
   tier INTEGER DEFAULT 0 CHECK (tier >= 0 AND tier <= 4),
   description TEXT,
   params JSONB DEFAULT '{}'::JSONB,
+  tiers JSONB DEFAULT '[]'::JSONB,
+  estimates JSONB DEFAULT '[]'::JSONB,
   created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+
+-- Pricing types used by the Admin pricing-types table.
+CREATE TABLE IF NOT EXISTS pricing_types (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT UNIQUE NOT NULL,
+  description TEXT,
+  icon TEXT,
+  category TEXT NOT NULL,
+  active BOOLEAN NOT NULL DEFAULT true,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+
+-- Delivery planner projects and their nested planner data.
+CREATE TABLE IF NOT EXISTS projects (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  description TEXT,
+  start_date DATE,
+  end_date DATE,
+  status TEXT NOT NULL DEFAULT 'active',
+  phases JSONB NOT NULL DEFAULT '[]'::JSONB,
+  wbs JSONB NOT NULL DEFAULT '[]'::JSONB,
+  team JSONB NOT NULL DEFAULT '[]'::JSONB,
+  raci JSONB NOT NULL DEFAULT '[]'::JSONB,
+  milestones JSONB NOT NULL DEFAULT '[]'::JSONB,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
@@ -76,6 +106,8 @@ CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
 CREATE INDEX IF NOT EXISTS idx_users_active ON users(active);
 CREATE INDEX IF NOT EXISTS idx_catalogues_type ON catalogues(type);
 CREATE INDEX IF NOT EXISTS idx_catalogues_created_by ON catalogues(created_by);
+CREATE INDEX IF NOT EXISTS idx_pricing_types_category ON pricing_types(category);
+CREATE INDEX IF NOT EXISTS idx_projects_status ON projects(status);
 CREATE INDEX IF NOT EXISTS idx_audit_logs_user_id ON audit_logs(user_id);
 CREATE INDEX IF NOT EXISTS idx_audit_logs_timestamp ON audit_logs(timestamp);
 CREATE INDEX IF NOT EXISTS idx_settings_key ON settings(key);

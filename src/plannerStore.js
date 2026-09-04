@@ -49,6 +49,17 @@ const DEMO_ROLES = [
   { id: '6', name: 'Business Analyst', description: 'Requirements & analysis' },
 ];
 
+const normalizeProject = (project) => ({
+  ...project,
+  startDate: project.startDate || project.start_date,
+  endDate: project.endDate || project.end_date,
+  phases: project.phases || [],
+  wbs: project.wbs || [],
+  team: project.team || [],
+  raci: project.raci || [],
+  milestones: project.milestones || [],
+});
+
 export const usePlannerStore = create((set, get) => ({
   projects: DEMO_PROJECTS,
   activeProject: DEMO_PROJECTS[0] || null,
@@ -70,8 +81,9 @@ export const usePlannerStore = create((set, get) => ({
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      set({ projects: data || DEMO_PROJECTS, isLoading: false });
-      return data || DEMO_PROJECTS;
+      const projects = data?.length ? data.map(normalizeProject) : DEMO_PROJECTS;
+      set({ projects, activeProject: projects[0] || null, isLoading: false });
+      return projects;
     } catch (err) {
       console.warn('Could not fetch projects, using demo data:', err.message);
       set({ projects: DEMO_PROJECTS, isLoading: false });
@@ -83,6 +95,10 @@ export const usePlannerStore = create((set, get) => ({
     try {
       const newProject = {
         ...project,
+        start_date: project.startDate,
+        end_date: project.endDate,
+        startDate: undefined,
+        endDate: undefined,
         id: crypto.randomUUID(),
         wbs: [],
         team: [],
@@ -100,11 +116,11 @@ export const usePlannerStore = create((set, get) => ({
       if (error) throw error;
 
       set(state => ({
-        projects: [data, ...state.projects],
-        activeProject: data,
+        projects: [normalizeProject(data), ...state.projects],
+        activeProject: normalizeProject(data),
       }));
 
-      return data;
+      return normalizeProject(data);
     } catch (err) {
       console.error('Error creating project:', err.message);
       set({ error: err.message });
@@ -116,7 +132,11 @@ export const usePlannerStore = create((set, get) => ({
     try {
       const { data, error } = await supabase
         .from('projects')
-        .update(updates)
+        .update({
+          ...updates,
+          ...(updates.startDate ? { start_date: updates.startDate, startDate: undefined } : {}),
+          ...(updates.endDate ? { end_date: updates.endDate, endDate: undefined } : {}),
+        })
         .eq('id', id)
         .select()
         .single();
@@ -124,11 +144,11 @@ export const usePlannerStore = create((set, get) => ({
       if (error) throw error;
 
       set(state => ({
-        projects: state.projects.map(p => p.id === id ? data : p),
-        activeProject: state.activeProject?.id === id ? data : state.activeProject,
+        projects: state.projects.map(p => p.id === id ? normalizeProject(data) : p),
+        activeProject: state.activeProject?.id === id ? normalizeProject(data) : state.activeProject,
       }));
 
-      return data;
+      return normalizeProject(data);
     } catch (err) {
       console.error('Error updating project:', err.message);
       set({ error: err.message });

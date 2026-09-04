@@ -67,10 +67,15 @@ export default function RoleManagementSection() {
       return;
     }
 
-    if (editingRole) {
-      await updateRole(editingRole.id, formData);
-    } else {
-      await addRole(formData);
+    try {
+      if (editingRole) {
+        await updateRole(editingRole.id, formData);
+      } else {
+        await addRole(formData);
+      }
+    } catch (error) {
+      alert(`Could not save role: ${error.message}`);
+      return;
     }
 
     setShowForm(false);

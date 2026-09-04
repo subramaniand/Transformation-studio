@@ -102,6 +102,13 @@ const DEMO_CATALOGUES = [
   },
 ];
 
+const normalizeCatalogue = (catalogue) => ({
+  ...catalogue,
+  parameters: catalogue.parameters || catalogue.params || {},
+  tiers: catalogue.tiers || DEMO_TIERS,
+  estimates: catalogue.estimates || [],
+});
+
 export const usePricingStore = create((set, get) => ({
   catalogues: DEMO_CATALOGUES,
   currentCatalogue: null,
@@ -128,7 +135,7 @@ export const usePricingStore = create((set, get) => ({
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      const catalogues = data?.length ? data : DEMO_CATALOGUES;
+      const catalogues = data?.length ? data.map(normalizeCatalogue) : DEMO_CATALOGUES;
       set({ catalogues, isLoading: false });
       return catalogues;
     } catch (err) {
@@ -143,6 +150,8 @@ export const usePricingStore = create((set, get) => ({
     try {
       const newCat = {
         ...catalogue,
+        params: catalogue.parameters || {},
+        parameters: undefined,
         id: crypto.randomUUID(),
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
@@ -156,11 +165,12 @@ export const usePricingStore = create((set, get) => ({
 
       if (error) throw error;
 
+      const normalizedCatalogue = normalizeCatalogue(data);
       set(state => ({
-        catalogues: [data, ...state.catalogues],
+        catalogues: [normalizedCatalogue, ...state.catalogues],
       }));
 
-      return data;
+      return normalizedCatalogue;
     } catch (err) {
       console.error('Error creating catalogue:', err.message);
       set({ error: err.message });
@@ -175,6 +185,7 @@ export const usePricingStore = create((set, get) => ({
         .from('catalogues')
         .update({
           ...updates,
+          ...(updates.parameters ? { params: updates.parameters, parameters: undefined } : {}),
           updated_at: new Date().toISOString(),
         })
         .eq('id', id)
@@ -184,11 +195,11 @@ export const usePricingStore = create((set, get) => ({
       if (error) throw error;
 
       set(state => ({
-        catalogues: state.catalogues.map(c => c.id === id ? data : c),
-        currentCatalogue: state.currentCatalogue?.id === id ? data : state.currentCatalogue,
+        catalogues: state.catalogues.map(c => c.id === id ? normalizeCatalogue(data) : c),
+        currentCatalogue: state.currentCatalogue?.id === id ? normalizeCatalogue(data) : state.currentCatalogue,
       }));
 
-      return data;
+      return normalizeCatalogue(data);
     } catch (err) {
       console.error('Error updating catalogue:', err.message);
       set({ error: err.message });
