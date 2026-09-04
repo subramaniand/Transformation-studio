@@ -260,7 +260,7 @@ export default function GanttView() {
                     key={task.id}
                     style={{
                       borderBottom: '1px solid var(--bd)',
-                      background: selectedTask?.id === task.id ? 'rgba(91, 76, 245, 0.1)' : 'transparent',
+                      background: selectedTask?.id === task.id ? 'rgba(0, 114, 188, 0.1)' : 'transparent',
                     }}
                     onClick={() => setSelectedTask(task)}
                   >
@@ -272,7 +272,7 @@ export default function GanttView() {
                       color: 'var(--tx2)',
                       position: 'sticky',
                       left: 0,
-                      background: selectedTask?.id === task.id ? 'rgba(91, 76, 245, 0.1)' : 'var(--bg)',
+                      background: selectedTask?.id === task.id ? 'rgba(0, 114, 188, 0.1)' : 'var(--bg)',
                       zIndex: 5,
                       verticalAlign: 'middle',
                       cursor: 'pointer',

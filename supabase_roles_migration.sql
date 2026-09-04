@@ -81,6 +81,7 @@ ALTER TABLE public.projects
   ADD COLUMN IF NOT EXISTS phases JSONB NOT NULL DEFAULT '[]'::JSONB,
   ADD COLUMN IF NOT EXISTS wbs JSONB NOT NULL DEFAULT '[]'::JSONB,
   ADD COLUMN IF NOT EXISTS team JSONB NOT NULL DEFAULT '[]'::JSONB,
+  ADD COLUMN IF NOT EXISTS roles JSONB NOT NULL DEFAULT '[]'::JSONB,
   ADD COLUMN IF NOT EXISTS raci JSONB NOT NULL DEFAULT '[]'::JSONB,
   ADD COLUMN IF NOT EXISTS milestones JSONB NOT NULL DEFAULT '[]'::JSONB,
   ADD COLUMN IF NOT EXISTS created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
@@ -88,3 +89,37 @@ ALTER TABLE public.projects
 
 CREATE INDEX IF NOT EXISTS idx_pricing_types_category ON public.pricing_types(category);
 CREATE INDEX IF NOT EXISTS idx_projects_status ON public.projects(status);
+
+-- Upgrade an existing audit_logs table before creating its indexes.
+ALTER TABLE public.audit_logs
+  ADD COLUMN IF NOT EXISTS user_id UUID,
+  ADD COLUMN IF NOT EXISTS user_email TEXT,
+  ADD COLUMN IF NOT EXISTS action TEXT,
+  ADD COLUMN IF NOT EXISTS detail TEXT,
+  ADD COLUMN IF NOT EXISTS resource_type TEXT,
+  ADD COLUMN IF NOT EXISTS resource_id TEXT,
+  ADD COLUMN IF NOT EXISTS timestamp TIMESTAMP WITH TIME ZONE DEFAULT now();
+
+CREATE INDEX IF NOT EXISTS idx_audit_logs_user_id ON public.audit_logs(user_id);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_timestamp ON public.audit_logs(timestamp);
+
+-- Upgrade an existing settings table before creating its index.
+CREATE TABLE IF NOT EXISTS public.settings (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  key TEXT,
+  value TEXT,
+  description TEXT,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+
+ALTER TABLE public.settings
+  ADD COLUMN IF NOT EXISTS key TEXT,
+  ADD COLUMN IF NOT EXISTS value TEXT,
+  ADD COLUMN IF NOT EXISTS description TEXT,
+  ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE DEFAULT now();
+
+UPDATE public.settings
+SET key = COALESCE(key, 'legacy_setting_' || id::TEXT)
+WHERE key IS NULL;
+
+CREATE INDEX IF NOT EXISTS idx_settings_key ON public.settings(key);

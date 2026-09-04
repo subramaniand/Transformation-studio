@@ -136,7 +136,12 @@ export const useAdminStore = create((set, get) => ({
     try {
       const newLog = {
         id: crypto.randomUUID(),
-        ...action,
+        user_id: action.userId,
+        user_email: action.userEmail,
+        action: action.action,
+        detail: action.details || action.detail,
+        resource_type: action.resource || action.resourceType,
+        resource_id: action.resourceId,
         timestamp: new Date().toISOString(),
       };
 
@@ -149,7 +154,7 @@ export const useAdminStore = create((set, get) => ({
       if (error) throw error;
 
       set(state => ({
-        auditLogs: [data, ...state.auditLogs],
+        auditLogs: [normalizeAuditLog(data), ...state.auditLogs],
       }));
 
       return data;
@@ -157,11 +162,11 @@ export const useAdminStore = create((set, get) => ({
       console.error('Error logging action:', err.message);
       // Still add to local logs even if Supabase fails
       set(state => ({
-        auditLogs: [{
+        auditLogs: [normalizeAuditLog({
           id: crypto.randomUUID(),
           ...action,
           timestamp: new Date().toISOString(),
-        }, ...state.auditLogs],
+        }), ...state.auditLogs],
       }));
     }
   },

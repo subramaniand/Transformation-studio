@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { supabase } from './supabaseClient';
+import { isSupabaseConfigured, supabase } from './supabaseClient';
 
 const DEMO_PROJECTS = [
   {
@@ -58,7 +58,22 @@ const normalizeProject = (project) => ({
   team: project.team || [],
   raci: project.raci || [],
   milestones: project.milestones || [],
+  roles: project.roles?.length ? project.roles : DEMO_ROLES,
 });
+
+const saveProjectTeam = async (project) => {
+  if (!isSupabaseConfigured || !project?.id) return project;
+
+  const { data, error } = await supabase
+    .from('projects')
+    .update({ team: project.team, roles: project.roles })
+    .eq('id', project.id)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return normalizeProject(data);
+};
 
 export const usePlannerStore = create((set, get) => ({
   projects: DEMO_PROJECTS,
@@ -104,6 +119,7 @@ export const usePlannerStore = create((set, get) => ({
         team: [],
         raci: [],
         milestones: [],
+        roles: DEMO_ROLES,
         created_at: new Date().toISOString(),
       };
 
@@ -222,22 +238,32 @@ export const usePlannerStore = create((set, get) => ({
   },
 
   // Team management
-  addTeamMember: (member) => {
+  addTeamMember: async (member) => {
+    let project;
     set(state => {
       if (!state.activeProject) return state;
-      return {
+      project = {
         activeProject: {
           ...state.activeProject,
           team: [...state.activeProject.team, member],
         },
       };
+      return project;
     });
+    if (project?.activeProject) {
+      const savedProject = await saveProjectTeam(project.activeProject);
+      set(state => ({
+        projects: state.projects.map(item => item.id === savedProject.id ? savedProject : item),
+        activeProject: savedProject,
+      }));
+    }
   },
 
-  updateTeamMember: (memberId, updates) => {
+  updateTeamMember: async (memberId, updates) => {
+    let project;
     set(state => {
       if (!state.activeProject) return state;
-      return {
+      project = {
         activeProject: {
           ...state.activeProject,
           team: state.activeProject.team.map(member =>
@@ -245,19 +271,36 @@ export const usePlannerStore = create((set, get) => ({
           ),
         },
       };
+      return project;
     });
+    if (project?.activeProject) {
+      const savedProject = await saveProjectTeam(project.activeProject);
+      set(state => ({
+        projects: state.projects.map(item => item.id === savedProject.id ? savedProject : item),
+        activeProject: savedProject,
+      }));
+    }
   },
 
-  removeTeamMember: (memberId) => {
+  removeTeamMember: async (memberId) => {
+    let project;
     set(state => {
       if (!state.activeProject) return state;
-      return {
+      project = {
         activeProject: {
           ...state.activeProject,
           team: state.activeProject.team.filter(member => member.id !== memberId),
         },
       };
+      return project;
     });
+    if (project?.activeProject) {
+      const savedProject = await saveProjectTeam(project.activeProject);
+      set(state => ({
+        projects: state.projects.map(item => item.id === savedProject.id ? savedProject : item),
+        activeProject: savedProject,
+      }));
+    }
   },
 
   // RACI management

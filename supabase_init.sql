@@ -71,6 +71,7 @@ CREATE TABLE IF NOT EXISTS projects (
   phases JSONB NOT NULL DEFAULT '[]'::JSONB,
   wbs JSONB NOT NULL DEFAULT '[]'::JSONB,
   team JSONB NOT NULL DEFAULT '[]'::JSONB,
+  roles JSONB NOT NULL DEFAULT '[]'::JSONB,
   raci JSONB NOT NULL DEFAULT '[]'::JSONB,
   milestones JSONB NOT NULL DEFAULT '[]'::JSONB,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
@@ -89,6 +90,16 @@ CREATE TABLE IF NOT EXISTS audit_logs (
   timestamp TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
 
+-- Upgrade an existing audit_logs table before creating its indexes.
+ALTER TABLE audit_logs
+  ADD COLUMN IF NOT EXISTS user_id UUID,
+  ADD COLUMN IF NOT EXISTS user_email TEXT,
+  ADD COLUMN IF NOT EXISTS action TEXT,
+  ADD COLUMN IF NOT EXISTS detail TEXT,
+  ADD COLUMN IF NOT EXISTS resource_type TEXT,
+  ADD COLUMN IF NOT EXISTS resource_id TEXT,
+  ADD COLUMN IF NOT EXISTS timestamp TIMESTAMP WITH TIME ZONE DEFAULT now();
+
 -- Settings table for application configuration
 CREATE TABLE IF NOT EXISTS settings (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -97,6 +108,17 @@ CREATE TABLE IF NOT EXISTS settings (
   description TEXT,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
+
+-- Upgrade an existing settings table before creating its index.
+ALTER TABLE settings
+  ADD COLUMN IF NOT EXISTS key TEXT,
+  ADD COLUMN IF NOT EXISTS value TEXT,
+  ADD COLUMN IF NOT EXISTS description TEXT,
+  ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE DEFAULT now();
+
+UPDATE settings
+SET key = COALESCE(key, 'legacy_setting_' || id::TEXT)
+WHERE key IS NULL;
 
 -- ════════════════════════════════════════════════════════════════
 -- CREATE INDEXES
@@ -139,8 +161,10 @@ SELECT
   'DC Exit',
   1,
   'Migration from on-premises data center',
-  id FROM users WHERE username = 'admin' LIMIT 1
-WHERE NOT EXISTS (SELECT 1 FROM catalogues WHERE name = 'DC Exit Programme');
+  id FROM users
+  WHERE username = 'admin'
+    AND NOT EXISTS (SELECT 1 FROM catalogues WHERE name = 'DC Exit Programme')
+  LIMIT 1;
 
 INSERT INTO catalogues (name, type, tier, description, created_by)
 SELECT
@@ -148,8 +172,10 @@ SELECT
   'App Development',
   2,
   'Large-scale application modernization',
-  id FROM users WHERE username = 'admin' LIMIT 1
-WHERE NOT EXISTS (SELECT 1 FROM catalogues WHERE name = 'Enterprise App Migration');
+  id FROM users
+  WHERE username = 'admin'
+    AND NOT EXISTS (SELECT 1 FROM catalogues WHERE name = 'Enterprise App Migration')
+  LIMIT 1;
 
 INSERT INTO catalogues (name, type, tier, description, created_by)
 SELECT
@@ -157,8 +183,10 @@ SELECT
   'Landing Zone',
   1,
   'AWS multi-account setup',
-  id FROM users WHERE username = 'analyst' LIMIT 1
-WHERE NOT EXISTS (SELECT 1 FROM catalogues WHERE name = 'AWS Landing Zone');
+  id FROM users
+  WHERE username = 'analyst'
+    AND NOT EXISTS (SELECT 1 FROM catalogues WHERE name = 'AWS Landing Zone')
+  LIMIT 1;
 
 -- ════════════════════════════════════════════════════════════════
 -- ENABLE ROW LEVEL SECURITY (OPTIONAL FOR PRODUCTION)

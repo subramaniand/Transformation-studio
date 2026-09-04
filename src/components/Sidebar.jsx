@@ -34,7 +34,7 @@ export default function Sidebar({ collapsed, onCollapse, activeModule, onModuleC
   const getRoleColor = (role) => {
     const colors = {
       admin: { bg: 'rgba(245,200,66,.15)', cl: '#f5c842' },
-      analyst: { bg: 'rgba(91,76,245,.15)', cl: '#a99ef8' },
+      analyst: { bg: 'rgba(0,114,188,.15)', cl: 'var(--brand-blue)' },
       viewer: { bg: 'rgba(26,158,110,.15)', cl: '#5ce0b0' },
     };
     return colors[role] || { bg: 'var(--bg4)', cl: 'var(--tx)' };

@@ -33,6 +33,7 @@ export default function RoleManagementSection() {
       admin: false,
       export: false,
     },
+    active: true,
   });
 
   const handleNewRole = () => {
@@ -46,6 +47,7 @@ export default function RoleManagementSection() {
         admin: false,
         export: false,
       },
+      active: true,
     });
     setEditingRole(null);
     setShowForm(true);
@@ -56,6 +58,7 @@ export default function RoleManagementSection() {
       name: role.name,
       description: role.description,
       permissions: { ...role.permissions },
+      active: role.active !== false,
     });
     setEditingRole(role);
     setShowForm(true);
@@ -116,7 +119,10 @@ export default function RoleManagementSection() {
     name: role.name,
     description: role.description,
     users: users.filter(user => user.role === role.name.toLowerCase()).length,
-    permissions: `${getPermissionCount(role.permissions)}/5`,
+    permissions: Object.entries(role.permissions)
+      .filter(([, enabled]) => enabled)
+      .map(([permission]) => permission.charAt(0).toUpperCase() + permission.slice(1))
+      .join(', ') || 'None',
     status: <Badge variant={role.active ? 'success' : 'danger'}>
       {role.active ? 'Active' : 'Inactive'}
     </Badge>,
@@ -191,6 +197,16 @@ export default function RoleManagementSection() {
                 ))}
               </div>
             </div>
+
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', fontSize: '12px', color: 'var(--tx2)' }}>
+              <input
+                type="checkbox"
+                checked={formData.active}
+                onChange={(e) => setFormData({ ...formData, active: e.target.checked })}
+                style={{ cursor: 'pointer' }}
+              />
+              Active role
+            </label>
 
             <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
               <Button

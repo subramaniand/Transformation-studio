@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { isSupabaseConfigured, supabase } from './supabaseClient';
+import { useAdminStore } from './adminStore';
 
 // Demo users for offline/initial use
 const DEMO_USERS = [
@@ -201,6 +202,12 @@ export const useAuthStore = create((set, get) => ({
   hasPermission: (permission) => {
     const { user } = get();
     if (!user) return false;
+    const customRole = useAdminStore.getState().roles.find(
+      role => role.name.toLowerCase() === user.role.toLowerCase()
+    );
+    if (customRole && Object.keys(customRole.permissions || {}).length > 0) {
+      return customRole.active !== false && customRole.permissions?.[permission] === true;
+    }
     return ROLE_PERMISSIONS[user.role]?.[permission] === 1;
   },
 }));

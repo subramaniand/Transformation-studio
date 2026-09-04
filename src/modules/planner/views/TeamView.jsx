@@ -12,7 +12,6 @@ import Button from '../../../components/ui/Button';
 import Table from '../../../components/ui/Table';
 import FormField from '../../../components/ui/FormField';
 
-const AVAILABLE_ROLES = ['Project Manager', 'Lead Architect', 'Developer', 'DevOps Engineer', 'QA Lead', 'Business Analyst'];
 const AVAILABLE_SKILLS = ['Cloud Architecture', 'AWS', 'Azure', 'Python', 'Java', 'React', 'DevOps', 'Data Engineering', 'UI/UX', 'Project Management', 'Agile', 'Testing'];
 
 export default function TeamView() {
@@ -89,14 +88,14 @@ export default function TeamView() {
     }));
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!formData.name || !formData.role) {
       alert('Please fill in name and role');
       return;
     }
 
     if (editingMember) {
-      updateTeamMember(editingMember.id, {
+      await updateTeamMember(editingMember.id, {
         name: formData.name,
         role: formData.role,
         availability: formData.availability,
@@ -117,7 +116,7 @@ export default function TeamView() {
         endDate: null,
         allocationPercent: parseInt(formData.allocationPercent),
       };
-      addTeamMember(newMember);
+      await addTeamMember(newMember);
     }
 
     if (editModalId) closeModal(editModalId);
@@ -328,7 +327,7 @@ export default function TeamView() {
               type="select"
               value={formData.role}
               onChange={handleFormChange}
-              options={AVAILABLE_ROLES.map(r => ({ value: r, label: r }))}
+              options={(activeProject.roles || []).map(role => ({ value: role.name || role, label: role.name || role }))}
             />
 
             <FormField
