@@ -1,7 +1,10 @@
 # Transformation Studio - React App Scan
 
+⚠️ **INTERNAL DOCUMENTATION** - For team members only  
+🔒 **This document should remain private** - Contains architecture & implementation details
+
 **Scan Date**: 2026-09-04  
-**Repository**: https://github.com/subramaniand/Transformation-studio  
+**Repository**: https://github.com/subramaniand/Transformation-studio (PRIVATE)  
 **Current Branch**: `dev` (newly created)
 
 ---

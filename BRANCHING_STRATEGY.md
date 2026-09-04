@@ -1,5 +1,8 @@
 # Transformation Studio - Git Branching Strategy
 
+⚠️ **INTERNAL DOCUMENTATION** - For team members only  
+🔒 **This document should remain private** - Contains internal process details
+
 ## Overview
 This repository follows a **GitHub Flow with Trunk-Based Development** approach, optimized for continuous delivery while maintaining stability.
 
