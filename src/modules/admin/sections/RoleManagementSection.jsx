@@ -1,7 +1,7 @@
 /**
  * RoleManagementSection - Role CRUD and management
  */
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAdminStore } from '../../../adminStore';
 import { useAuthStore } from '../../../authStore';
 import Card from '../../../components/ui/Card';
@@ -15,7 +15,12 @@ export default function RoleManagementSection() {
   const addRole = useAdminStore(state => state.addRole);
   const updateRole = useAdminStore(state => state.updateRole);
   const deleteRole = useAdminStore(state => state.deleteRole);
+  const fetchRoles = useAdminStore(state => state.fetchRoles);
   const users = useAuthStore(state => state.users);
+
+  useEffect(() => {
+    fetchRoles().catch(error => alert(`Could not load roles from Supabase: ${error.message}`));
+  }, [fetchRoles]);
   const [editingRole, setEditingRole] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
@@ -56,16 +61,16 @@ export default function RoleManagementSection() {
     setShowForm(true);
   };
 
-  const handleSaveRole = () => {
+  const handleSaveRole = async () => {
     if (!formData.name) {
       alert('Role name is required');
       return;
     }
 
     if (editingRole) {
-      updateRole(editingRole.id, formData);
+      await updateRole(editingRole.id, formData);
     } else {
-      addRole(formData);
+      await addRole(formData);
     }
 
     setShowForm(false);
@@ -74,7 +79,7 @@ export default function RoleManagementSection() {
 
   const handleDeleteRole = (roleId) => {
     if (confirm('Are you sure you want to delete this role?')) {
-      deleteRole(roleId);
+      deleteRole(roleId).catch(error => alert(`Could not delete role: ${error.message}`));
     }
   };
 

@@ -14,22 +14,9 @@ const ROLE_PERMISSIONS = {
   viewer: { edit: 0, admin: 0, del: 0, create: 0, export: 1 },
 };
 
-const getStoredUsers = () => {
-  try {
-    const stored = localStorage.getItem('users');
-    return stored ? JSON.parse(stored) : DEMO_USERS;
-  } catch {
-    return DEMO_USERS;
-  }
-};
-
-const persistUsers = (users) => {
-  localStorage.setItem('users', JSON.stringify(users));
-};
-
 export const useAuthStore = create((set, get) => ({
   user: null,
-  users: getStoredUsers(),
+  users: DEMO_USERS,
   isLoading: false,
   error: null,
   theme: 'ust-light',
@@ -48,7 +35,6 @@ export const useAuthStore = create((set, get) => ({
 
         if (!error && data) {
           set({ user: data, isLoading: false });
-          localStorage.setItem('auth_user', JSON.stringify(data));
           return { success: true, user: data };
         }
       }
@@ -57,7 +43,6 @@ export const useAuthStore = create((set, get) => ({
       const demoUser = DEMO_USERS.find(u => u.username === username && u.password === password);
       if (demoUser) {
         set({ user: demoUser, isLoading: false });
-        localStorage.setItem('auth_user', JSON.stringify(demoUser));
         return { success: true, user: demoUser };
       }
 
@@ -71,15 +56,6 @@ export const useAuthStore = create((set, get) => ({
   // Logout user
   logout: () => {
     set({ user: null });
-    localStorage.removeItem('auth_user');
-  },
-
-  // Restore session
-  restoreSession: () => {
-    const stored = localStorage.getItem('auth_user');
-    if (stored) {
-      set({ user: JSON.parse(stored) });
-    }
   },
 
   // Fetch all users (admin only)
@@ -92,13 +68,12 @@ export const useAuthStore = create((set, get) => ({
     try {
       const { data, error } = await supabase.from('users').select('*');
       if (error) throw error;
-      const users = data?.length ? data : getStoredUsers();
-      persistUsers(users);
+      const users = data?.length ? data : DEMO_USERS;
       set({ users, isLoading: false });
       return users;
     } catch (err) {
       console.warn('Could not fetch users from Supabase, using demo data');
-      const users = getStoredUsers();
+      const users = DEMO_USERS;
       set({ users, isLoading: false });
       return users;
     }
@@ -116,7 +91,6 @@ export const useAuthStore = create((set, get) => ({
 
       if (!isSupabaseConfigured) {
         const users = [...get().users, user];
-        persistUsers(users);
         set({ users });
         return user;
       }
@@ -132,21 +106,15 @@ export const useAuthStore = create((set, get) => ({
       set(state => ({
         users: [...state.users, data || user],
       }));
-      persistUsers(get().users);
 
       return data || user;
     } catch (err) {
       console.error('Error adding user:', err.message);
       // Still add to local list even if Supabase fails
       set(state => ({
-        users: [...state.users, {
-          ...newUser,
-          id: crypto.randomUUID(),
-          created: new Date().toISOString().split('T')[0],
-          active: true,
-        }],
+        users: [...state.users, user],
       }));
-      throw err;
+      return user;
     }
   },
 
@@ -155,13 +123,11 @@ export const useAuthStore = create((set, get) => ({
     if (!isSupabaseConfigured) {
       const users = get().users.map(user => user.id === userId ? { ...user, ...updates } : user);
       const updatedUser = users.find(user => user.id === userId);
-      persistUsers(users);
       set({
         users,
         user: get().user?.id === userId ? updatedUser : get().user,
       });
       if (updatedUser?.id === get().user?.id) {
-        localStorage.setItem('auth_user', JSON.stringify(updatedUser));
       }
       return updatedUser;
     }
@@ -181,12 +147,6 @@ export const useAuthStore = create((set, get) => ({
         users: state.users.map(u => u.id === userId ? (data || { ...u, ...updates }) : u),
         user: state.user?.id === userId ? (data || { ...state.user, ...updates }) : state.user,
       }));
-      persistUsers(get().users);
-
-      if (data) {
-        localStorage.setItem('auth_user', JSON.stringify(data));
-      }
-
       return data;
     } catch (err) {
       console.error('Error updating user:', err.message);
@@ -195,8 +155,7 @@ export const useAuthStore = create((set, get) => ({
         users: state.users.map(u => u.id === userId ? { ...u, ...updates } : u),
         user: state.user?.id === userId ? { ...state.user, ...updates } : state.user,
       }));
-      persistUsers(get().users);
-      throw err;
+      return get().users.find(user => user.id === userId);
     }
   },
 
@@ -204,7 +163,6 @@ export const useAuthStore = create((set, get) => ({
   deleteUser: async (userId) => {
     if (!isSupabaseConfigured) {
       const users = get().users.filter(user => user.id !== userId);
-      persistUsers(users);
       set({ users, user: get().user?.id === userId ? null : get().user });
       return true;
     }
@@ -221,8 +179,6 @@ export const useAuthStore = create((set, get) => ({
         users: state.users.filter(u => u.id !== userId),
         user: state.user?.id === userId ? null : state.user,
       }));
-      persistUsers(get().users);
-
       return true;
     } catch (err) {
       console.error('Error deleting user:', err.message);
@@ -231,23 +187,14 @@ export const useAuthStore = create((set, get) => ({
         users: state.users.filter(u => u.id !== userId),
         user: state.user?.id === userId ? null : state.user,
       }));
-      persistUsers(get().users);
-      throw err;
+      return true;
     }
   },
 
   // Set theme
   setTheme: (theme) => {
     set({ theme });
-    localStorage.setItem('theme', theme);
     document.documentElement.className = theme === 'default' ? '' : theme;
-  },
-
-  // Restore theme
-  restoreTheme: () => {
-    const stored = localStorage.getItem('theme') || 'default';
-    set({ theme: stored });
-    document.documentElement.className = stored === 'default' ? '' : stored;
   },
 
   // Check permission

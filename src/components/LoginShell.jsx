@@ -84,15 +84,6 @@ export default function LoginShell() {
           </button>
         </form>
 
-        <div className="lhint" style={{ marginTop: '16px', display: 'block' }}>
-          <strong style={{ color: 'var(--tx2)' }}>Demo credentials:</strong>
-          <br />
-          Admin: admin / admin123
-          <br />
-          Analyst: analyst / analyst123
-          <br />
-          Viewer: viewer / view123
-        </div>
       </div>
     </div>
   );

@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS users (
   password TEXT NOT NULL,
   name TEXT NOT NULL,
   email TEXT NOT NULL,
-  role TEXT NOT NULL DEFAULT 'viewer' CHECK (role IN ('admin', 'analyst', 'viewer')),
+  role TEXT NOT NULL DEFAULT 'viewer',
   "function" TEXT,
   active BOOLEAN DEFAULT true,
   created TIMESTAMP WITH TIME ZONE DEFAULT now(),
@@ -24,8 +24,15 @@ CREATE TABLE IF NOT EXISTS roles (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT UNIQUE NOT NULL,
   description TEXT,
+  permissions JSONB NOT NULL DEFAULT '{}'::JSONB,
+  active BOOLEAN NOT NULL DEFAULT true,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
+
+-- Allow custom roles on databases created from an earlier schema version.
+ALTER TABLE users DROP CONSTRAINT IF EXISTS users_role_check;
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS permissions JSONB NOT NULL DEFAULT '{}'::JSONB;
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS active BOOLEAN NOT NULL DEFAULT true;
 
 -- Catalogues table for pricing catalogues
 CREATE TABLE IF NOT EXISTS catalogues (

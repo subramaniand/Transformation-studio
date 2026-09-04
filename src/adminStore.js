@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { supabase } from './supabaseClient';
+import { isSupabaseConfigured, supabase } from './supabaseClient';
 
 const DEMO_AUDIT_LOGS = [
   {
@@ -84,21 +84,8 @@ const DEMO_ROLES = [
   },
 ];
 
-const getStoredRoles = () => {
-  try {
-    const stored = localStorage.getItem('roles');
-    return stored ? JSON.parse(stored) : DEMO_ROLES;
-  } catch {
-    return DEMO_ROLES;
-  }
-};
-
-const persistRoles = (roles) => {
-  localStorage.setItem('roles', JSON.stringify(roles));
-};
-
 export const useAdminStore = create((set, get) => ({
-  roles: getStoredRoles(),
+  roles: DEMO_ROLES,
   auditLogs: DEMO_AUDIT_LOGS,
   pricingTypes: DEMO_PRICING_TYPES,
   systemStatus: SYSTEM_STATUS_INIT,
@@ -278,6 +265,32 @@ export const useAdminStore = create((set, get) => ({
     }));
   },
 
+  fetchRoles: async () => {
+    if (!isSupabaseConfigured) {
+      return get().roles;
+    }
+
+    set({ isLoading: true, error: null });
+    try {
+      const { data, error } = await supabase
+        .from('roles')
+        .select('*')
+        .order('name');
+
+      if (error) throw error;
+      const roles = data?.length ? data.map(role => ({
+        ...role,
+        permissions: role.permissions || {},
+        active: role.active ?? true,
+      })) : DEMO_ROLES;
+      set({ roles, isLoading: false });
+      return roles;
+    } catch (err) {
+      set({ error: err.message, isLoading: false });
+      throw err;
+    }
+  },
+
   // Selection
   selectUser: (user) => {
     set({ selectedUser: user });
@@ -287,28 +300,41 @@ export const useAdminStore = create((set, get) => ({
     set({ editingRole: role });
   },
 
-  addRole: (role) => {
+  addRole: async (role) => {
     const newRole = {
       ...role,
-      id: crypto.randomUUID(),
-      users: 0,
       active: true,
     };
-    const roles = [...get().roles, newRole];
-    persistRoles(roles);
+
+    if (!isSupabaseConfigured) {
+      const localRole = { ...newRole, id: crypto.randomUUID(), users: 0 };
+      set({ roles: [...get().roles, localRole] });
+      return localRole;
+    }
+
+    const { data, error } = await supabase.from('roles').insert([newRole]).select().single();
+    if (error) throw error;
+    const roles = [...get().roles, data];
     set({ roles });
-    return newRole;
+    return data;
   },
 
-  updateRole: (roleId, updates) => {
+  updateRole: async (roleId, updates) => {
+    if (isSupabaseConfigured) {
+      const { data, error } = await supabase.from('roles').update(updates).eq('id', roleId).select().single();
+      if (error) throw error;
+      updates = data;
+    }
     const roles = get().roles.map(role => role.id === roleId ? { ...role, ...updates } : role);
-    persistRoles(roles);
     set({ roles });
   },
 
-  deleteRole: (roleId) => {
+  deleteRole: async (roleId) => {
+    if (isSupabaseConfigured) {
+      const { error } = await supabase.from('roles').delete().eq('id', roleId);
+      if (error) throw error;
+    }
     const roles = get().roles.filter(role => role.id !== roleId);
-    persistRoles(roles);
     set({ roles });
   },
 

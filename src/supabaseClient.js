@@ -10,7 +10,13 @@ if (!isSupabaseConfigured) {
 
 export const supabase = createClient(
   supabaseUrl || 'https://YOUR_PROJECT.supabase.co',
-  supabaseAnonKey || 'YOUR_ANON_KEY_HERE'
+  supabaseAnonKey || 'YOUR_ANON_KEY_HERE',
+  {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+    },
+  }
 );
 
 // Test connection

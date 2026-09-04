@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useAuthStore } from './authStore';
 import { ModalProvider } from './context/ModalContext';
 import './App.css';
@@ -9,19 +9,8 @@ import Content from './components/Content';
 
 export default function App() {
   const user = useAuthStore(state => state.user);
-  const restoreSession = useAuthStore(state => state.restoreSession);
-  const restoreTheme = useAuthStore(state => state.restoreTheme);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [activeModule, setActiveModule] = useState('pricing');
-
-  useEffect(() => {
-    try {
-      restoreSession();
-      restoreTheme();
-    } catch (err) {
-      console.error('Error restoring session:', err);
-    }
-  }, []);
 
   if (!user) {
     return <LoginShell />;
