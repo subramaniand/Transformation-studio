@@ -13,6 +13,19 @@ dist-ssr
 .env.local
 .env.*.local
 
+# Sensitive documentation
+README.md
+SETUP_GUIDE.md
+QUICK_START.md
+SECURITY_PRIVACY_GUIDE.md
+PROJECT_SCAN.md
+BRANCHING_STRATEGY.md
+MAKE_REPO_PRIVATE_QUICK_GUIDE.txt
+
+# SQL files and database migrations
+supabase_init.sql
+supabase_roles_migration.sql
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
