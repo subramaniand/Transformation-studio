@@ -888,6 +888,16 @@ body {
   cursor: default;
 }
 
+.complexity-tabs button.read-only {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.complexity-tabs button.read-only:hover {
+  background: var(--bg3);
+  border-color: var(--bd);
+}
+
 .complexity-tabs small {
   margin-left: auto;
   color: var(--tx3);

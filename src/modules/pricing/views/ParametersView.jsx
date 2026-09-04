@@ -58,9 +58,15 @@ export default function ParametersView() {
           {tiers.map((tier, index) => (
             <button
               key={tier.id || tier.name}
-              className={currentCatalogue.tier === index ? 'active' : ''}
-              onClick={() => hasPermission('edit') && updateCatalogueTier(currentCatalogue.id, index)}
-              disabled={!hasPermission('edit')}
+              className={`${currentCatalogue.tier === index ? 'active' : ''} ${!hasPermission('edit') ? 'read-only' : ''}`}
+              onClick={() => {
+                if (hasPermission('edit')) {
+                  updateCatalogueTier(currentCatalogue.id, index);
+                } else {
+                  alert('You need edit permission to change complexity tier. Please contact an administrator.');
+                }
+              }}
+              title={!hasPermission('edit') ? 'You do not have edit permission' : `Select ${tier.name}`}
               style={{ '--tier-color': tier.color || 'var(--ac)' }}
             >
               <span className="complexity-dot" />
